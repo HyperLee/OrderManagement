@@ -35,15 +35,15 @@
 
 **⚠️ 重要**: 此階段未完成前，任何使用者故事都無法開始實作
 
-- [ ] T008 建立 PhoneType 列舉在 OrderLunchWeb/Models/PhoneType.cs
-- [ ] T009 建立 MenuItem 實體類別在 OrderLunchWeb/Models/MenuItem.cs (包含 Data Annotations 驗證)
-- [ ] T010 建立 Store 實體類別在 OrderLunchWeb/Models/Store.cs (包含 Data Annotations 驗證和關聯)
-- [ ] T011 建立 IFileStorage 介面在 OrderLunchWeb/Data/IFileStorage.cs
-- [ ] T012 建立 JsonFileStorage 實作在 OrderLunchWeb/Data/JsonFileStorage.cs (包含 UTF-8 編碼、ID 管理、async/await)
-- [ ] T013 建立 IStoreService 介面在 OrderLunchWeb/Services/IStoreService.cs
-- [ ] T014 在 Program.cs 設定 Serilog (主控台和檔案輸出、UTF-8 編碼)
-- [ ] T015 在 Program.cs 註冊相依性注入: IFileStorage (Singleton), IStoreService (Scoped)
-- [ ] T016 確保 JsonFileStorage 實作中包含自動建立 Data 資料夾和 stores.json 的邏輯（若不存在則建立，符合 FR-008-1）
+- [X] T008 建立 PhoneType 列舉在 OrderLunchWeb/Models/PhoneType.cs
+- [X] T009 建立 MenuItem 實體類別在 OrderLunchWeb/Models/MenuItem.cs (包含 Data Annotations 驗證)
+- [X] T010 建立 Store 實體類別在 OrderLunchWeb/Models/Store.cs (包含 Data Annotations 驗證和關聯)
+- [X] T011 建立 IFileStorage 介面在 OrderLunchWeb/Data/IFileStorage.cs
+- [X] T012 建立 JsonFileStorage 實作在 OrderLunchWeb/Data/JsonFileStorage.cs (包含 UTF-8 編碼、ID 管理、async/await)
+- [X] T013 建立 IStoreService 介面在 OrderLunchWeb/Services/IStoreService.cs
+- [X] T014 在 Program.cs 設定 Serilog (主控台和檔案輸出、UTF-8 編碼)
+- [X] T015 在 Program.cs 註冊相依性注入: IFileStorage (Singleton), IStoreService (Scoped)
+- [X] T016 確保 JsonFileStorage 實作中包含自動建立 Data 資料夾和 stores.json 的邏輯（若不存在則建立，符合 FR-008-1）
 
 **Checkpoint**: 基礎建設完成 - 使用者故事實作現在可以開始
 
