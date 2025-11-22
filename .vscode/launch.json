@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch OrderLunchWeb (DLL)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/OrderLunchWeb/bin/Debug/net8.0/OrderLunchWeb.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/OrderLunchWeb",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7068;http://localhost:5289"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/OrderLunchWeb/Views"
+      },
+      "console": "integratedTerminal",
+      "outputCapture": "std",
+      "serverReadyAction": {
+        "pattern": "Now listening on: (https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "openExternally",
+        "webRoot": "${workspaceFolder}/OrderLunchWeb"
+      }
+    }
+  ]
+}
