@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build OrderLunchWeb",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/OrderLunchWeb/OrderLunchWeb.csproj",
+        "-c",
+        "Debug"
+      ],
+      "problemMatcher": ["$msCompile"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "run OrderLunchWeb",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/OrderLunchWeb/OrderLunchWeb.csproj",
+        "--no-build"
+      ],
+      "problemMatcher": ["$msCompile"]
+    }
+  ]
+}
