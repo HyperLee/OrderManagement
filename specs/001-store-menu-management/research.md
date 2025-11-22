@@ -452,6 +452,343 @@ public class JsonFileStorage
 
 ---
 
+### 8. Serilog 結構化日誌實作
+
+**決策**: 使用 Serilog 取代內建 ILogger，提供更強大的結構化日誌功能
+
+**理由**:
+
+- **結構化日誌**: 支援結構化資料記錄，方便查詢和分析
+- **多重輸出**: 同時輸出到主控台和檔案，支援日期滾動
+- **效能優化**: 比內建 Logger 更高效，支援非同步寫入
+- **豐富的 Sink**: 提供多種輸出目標 (Console, File, Seq, Application Insights 等)
+- **易於配置**: 透過 `appsettings.json` 或程式碼配置
+
+**實作範例**:
+
+```csharp
+// Program.cs
+using Serilog;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 配置 Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "Logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+        encoding: System.Text.Encoding.UTF8)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// ... 其他配置
+
+var app = builder.Build();
+
+// 確保應用程式結束時清理 Serilog
+app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+```
+
+**appsettings.json 配置**:
+
+```json
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information",
+        "System": "Warning"
+      }
+    }
+  }
+}
+```
+
+**使用範例**:
+
+```csharp
+public class StoreService : IStoreService
+{
+    private readonly ILogger<StoreService> _logger;
+
+    public async Task<Store> AddStoreAsync(Store store)
+    {
+        _logger.LogInformation("正在新增店家: {StoreName}, 電話: {Phone}", 
+            store.Name, store.Phone);
+        
+        try
+        {
+            // 業務邏輯
+            var result = await _fileStorage.AddStoreAsync(store);
+            
+            _logger.LogInformation("店家新增成功: StoreId={StoreId}, Name={StoreName}", 
+                result.Id, result.Name);
+            
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "新增店家失敗: {StoreName}", store.Name);
+            throw;
+        }
+    }
+}
+```
+
+**必要套件**:
+
+```xml
+<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+<PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+```
+
+**考慮的替代方案**:
+
+- **內建 ILogger**: 功能較陽春，結構化支援較弱
+- **NLog**: 功能類似，但 Serilog 在 .NET Core 生態系統更受歡迎
+- **log4net**: 較舊的方案，不建議新專案使用
+
+**參考資料**:
+
+- [Serilog 官方文件](https://serilog.net/)
+- [ASP.NET Core with Serilog](https://github.com/serilog/serilog-aspnetcore)
+
+---
+
+### 9. 測試專案環境確認與容錯機制
+
+**決策**: 建立測試環境檢查機制，避免測試執行時因環境問題耗時卡住
+
+**理由**:
+
+- **快速失敗**: 環境問題應在測試開始前就被發現，而非執行中卡住
+- **明確錯誤**: 提供清晰的錯誤訊息，指出具體環境問題
+- **逾時控制**: 設定合理的測試逾時時間，避免無限等待
+- **隔離測試**: 測試資料與正式資料隔離，避免互相影響
+
+**實作策略**:
+
+#### 1. xUnit 執行器配置 (xunit.runner.json)
+
+```json
+{
+  "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
+  "methodDisplay": "method",
+  "methodDisplayOptions": "all",
+  "maxParallelThreads": 1,
+  "parallelizeAssembly": false,
+  "parallelizeTestCollections": false,
+  "diagnosticMessages": true,
+  "internalDiagnosticMessages": false,
+  "longRunningTestSeconds": 10
+}
+```
+
+**說明**:
+
+- `maxParallelThreads: 1`: 單執行緒執行，避免 JSON 檔案併發寫入問題
+- `longRunningTestSeconds: 10`: 超過 10 秒的測試會被標記為長時間執行
+- `diagnosticMessages: true`: 顯示診斷訊息，方便除錯
+
+#### 2. 測試環境檢查類別
+
+```csharp
+namespace OrderLunchWeb.Tests.TestHelpers;
+
+/// <summary>
+/// 測試環境檢查與設定
+/// </summary>
+public static class TestEnvironment
+{
+    private static bool _isInitialized = false;
+    private static readonly object _lock = new();
+
+    /// <summary>
+    /// 初始化測試環境，確保必要條件滿足
+    /// </summary>
+    public static void Initialize()
+    {
+        lock (_lock)
+        {
+            if (_isInitialized) return;
+
+            // 檢查 .NET 版本
+            var version = Environment.Version;
+            if (version.Major < 8)
+            {
+                throw new InvalidOperationException(
+                    $"測試需要 .NET 8.0 或更高版本，目前版本: {version}");
+            }
+
+            // 檢查測試資料目錄
+            var testDataDir = Path.Combine(AppContext.BaseDirectory, "TestData");
+            if (!Directory.Exists(testDataDir))
+            {
+                Directory.CreateDirectory(testDataDir);
+            }
+
+            // 清理舊的測試資料
+            CleanupTestData();
+
+            _isInitialized = true;
+        }
+    }
+
+    /// <summary>
+    /// 取得測試用的 JSON 檔案路徑
+    /// </summary>
+    public static string GetTestFilePath(string testName)
+    {
+        var fileName = $"test-{testName}-{Guid.NewGuid():N}.json";
+        return Path.Combine(AppContext.BaseDirectory, "TestData", fileName);
+    }
+
+    /// <summary>
+    /// 清理測試資料 (刪除超過 1 小時的舊檔案)
+    /// </summary>
+    public static void CleanupTestData()
+    {
+        var testDataDir = Path.Combine(AppContext.BaseDirectory, "TestData");
+        if (!Directory.Exists(testDataDir)) return;
+
+        var files = Directory.GetFiles(testDataDir, "test-*.json");
+        var cutoffTime = DateTime.Now.AddHours(-1);
+
+        foreach (var file in files)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.CreationTime < cutoffTime)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+                // 忽略清理失敗
+            }
+        }
+    }
+}
+```
+
+#### 3. 測試基底類別 (選用)
+
+```csharp
+namespace OrderLunchWeb.Tests;
+
+/// <summary>
+/// 測試基底類別，提供共用設定
+/// </summary>
+public abstract class TestBase : IDisposable
+{
+    protected readonly string TestFilePath;
+    protected readonly ITestOutputHelper Output;
+
+    protected TestBase(ITestOutputHelper output)
+    {
+        Output = output;
+        TestEnvironment.Initialize();
+        TestFilePath = TestEnvironment.GetTestFilePath(GetType().Name);
+    }
+
+    public virtual void Dispose()
+    {
+        // 清理測試檔案
+        if (File.Exists(TestFilePath))
+        {
+            try
+            {
+                File.Delete(TestFilePath);
+            }
+            catch
+            {
+                // 忽略清理失敗
+            }
+        }
+    }
+}
+```
+
+#### 4. 測試逾時控制
+
+```csharp
+public class StoreServiceTests
+{
+    [Fact(Timeout = 5000)] // 5 秒逾時
+    public async Task AddStore_ShouldCreateNewStore()
+    {
+        // 測試邏輯
+    }
+
+    [Fact(Skip = "需要實際檔案系統，CI 環境跳過")]
+    public async Task FileSystemIntensiveTest()
+    {
+        // 需要檔案系統的測試
+    }
+}
+```
+
+#### 5. 整合測試的 WebApplicationFactory 配置
+
+```csharp
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices(services =>
+        {
+            // 移除正式的 FileStorage，替換為測試用的
+            var descriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IFileStorage));
+            if (descriptor != null)
+            {
+                services.Remove(descriptor);
+            }
+
+            // 註冊測試用的 FileStorage (使用記憶體或臨時檔案)
+            services.AddSingleton<IFileStorage>(sp =>
+            {
+                var testFilePath = TestEnvironment.GetTestFilePath("integration");
+                return new JsonFileStorage(testFilePath);
+            });
+        });
+
+        builder.ConfigureLogging(logging =>
+        {
+            // 測試時降低日誌層級
+            logging.SetMinimumLevel(LogLevel.Warning);
+        });
+
+        // 設定測試環境
+        builder.UseEnvironment("Testing");
+    }
+}
+```
+
+**考慮的替代方案**:
+
+- **In-Memory 儲存**: 完全不使用檔案，但無法測試 JSON 序列化問題
+- **Docker 測試容器**: 過度設計，對練習用專案太複雜
+- **Moq 完全模擬**: 無法測試真實的檔案 I/O 問題
+
+**參考資料**:
+
+- [xUnit Configuration](https://xunit.net/docs/configuration-files)
+- [ASP.NET Core Integration Tests](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests)
+
+---
+
 ## 結論
 
 所有技術決策都已明確，無未解決的 NEEDS CLARIFICATION。研究結果為 Phase 1 的實作提供了清晰的技術方向。
@@ -465,5 +802,7 @@ public class JsonFileStorage
 5. **即時時間**: 客戶端 JavaScript setInterval
 6. **搜尋**: 客戶端即時篩選
 7. **ID 管理**: 記憶體計數器 + JSON 持久化
+8. **日誌系統**: Serilog 結構化日誌 (主控台 + 檔案輸出)
+9. **測試環境**: 環境檢查機制 + 逾時控制 + 資料隔離
 
 下一步: 進入 Phase 1，生成 data-model.md 和 API contracts。

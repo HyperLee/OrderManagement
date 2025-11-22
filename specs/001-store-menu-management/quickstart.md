@@ -307,25 +307,71 @@ info: Microsoft.Hosting.Lifetime[0]
 
 ## 步驟 7: 執行測試 (實作後)
 
+### 測試環境檢查
+
+在執行測試前，確認環境已正確設定:
+
 ```bash
-# 執行所有測試
-dotnet test
+# 檢查 .NET 版本 (需 >= 8.0)
+dotnet --version
+
+# 切換到測試專案目錄
+cd OrderLunchWeb.Tests
+
+# 還原測試專案相依套件
+dotnet restore
+```
+
+### 執行測試
+
+```bash
+# 執行所有測試 (建議加上逾時保護)
+dotnet test --timeout 30000
 
 # 執行特定測試類別
 dotnet test --filter FullyQualifiedName~StoreServiceTests
 
 # 執行測試並顯示詳細輸出
 dotnet test --verbosity normal
+
+# 執行測試並產生覆蓋率報告 (需安裝 coverlet)
+dotnet test /p:CollectCoverage=true /p:CoverageReportFormat=opencover
 ```
 
 **預期輸出**:
 
-```
+```text
 Test run for OrderLunchWeb.Tests.dll (.NET 8.0)
 Microsoft (R) Test Execution Command Line Tool Version X.X.X
 Starting test execution, please wait...
 
 Passed!  - Failed:     0, Passed:    XX, Skipped:     0, Total:    XX
+Time: XX.XXXs
+```
+
+### 測試逾時與容錯
+
+**測試配置** (`xunit.runner.json`):
+
+- ⏱️ **逾時控制**: 長時間測試 (>10 秒) 會被標記
+- 🔒 **單執行緒**: 避免 JSON 檔案併發寫入問題
+- 🧹 **自動清理**: 測試完成後自動清理臨時檔案
+
+**如果測試卡住**:
+
+1. **檢查檔案鎖定**: 確認沒有其他程式開啟測試資料檔案
+2. **清理測試資料**: 手動刪除 `OrderLunchWeb.Tests/bin/Debug/net8.0/TestData/` 目錄
+3. **重新建置**: `dotnet clean && dotnet build`
+4. **個別執行**: 使用 `--filter` 參數逐一執行測試，找出問題測試
+
+**跳過有問題的測試**:
+
+```csharp
+[Fact(Skip = "暫時跳過，待環境問題解決")]
+public async Task ProblematicTest()
+{
+    // 測試邏輯
+}
 ```
 
 ---
@@ -414,6 +460,52 @@ OrderLunchWeb/
 
 - 檢查 `JsonFileStorage.InitializeAsync()` 是否正確計算 `nextStoreId`
 - 確認 `stores.json` 中的 `nextStoreId` 和 `nextMenuItemId` 正確儲存
+
+### 6. 測試執行卡住或逾時
+
+**問題**: `dotnet test` 執行時卡住，無回應或逾時
+
+**解決方案**:
+
+- **檢查檔案鎖定**: 關閉所有可能開啟測試資料檔案的程式 (如文字編輯器、檔案總管)
+- **清理測試資料**: 刪除 `OrderLunchWeb.Tests/bin/Debug/net8.0/TestData/` 目錄
+- **檢查逾時設定**: 確認 `xunit.runner.json` 存在且設定正確
+- **單獨執行測試**: 使用 `--filter` 參數找出有問題的測試
+- **重新建置**: 執行 `dotnet clean && dotnet build`
+- **檢查 .NET 版本**: 確認版本 >= 8.0
+
+```bash
+# 清理並重新建置
+dotnet clean
+dotnet build
+
+# 執行測試加上逾時保護
+dotnet test --timeout 30000
+
+# 個別執行測試類別
+dotnet test --filter FullyQualifiedName~StoreServiceTests --verbosity normal
+```
+
+### 7. Serilog 日誌檔案無法寫入
+
+**問題**: 應用程式啟動後無法建立或寫入日誌檔案
+
+**解決方案**:
+
+- **檢查權限**: 確認應用程式有權限寫入 `Logs/` 目錄
+- **手動建立目錄**: 先手動建立 `Logs/` 目錄
+- **檢查磁碟空間**: 確認磁碟有足夠空間
+- **檢查檔案鎖定**: 確認日誌檔案未被其他程式開啟
+- **檢查編碼設定**: 確認 Serilog 配置使用 UTF-8 編碼
+
+```csharp
+// 在 Program.cs 中確保目錄存在
+var logsDir = Path.Combine(AppContext.BaseDirectory, "Logs");
+if (!Directory.Exists(logsDir))
+{
+    Directory.CreateDirectory(logsDir);
+}
+```
 
 ---
 

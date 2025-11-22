@@ -17,6 +17,9 @@
 
 - ASP.NET Core MVC 8.0 (內建)
 - System.Text.Json (JSON 序列化/反序列化，UTF-8 編碼支援)
+- Serilog.AspNetCore (結構化日誌)
+- Serilog.Sinks.Console (主控台日誌輸出)
+- Serilog.Sinks.File (檔案日誌輸出)
 - Bootstrap 5 (已在專案中，用於 UI 樣式)
 - jQuery (已在專案中，用於客戶端驗證)
 
@@ -88,8 +91,9 @@
 
 ### V. 可觀察性與監控
 
-- ✅ **結構化日誌**: 使用內建 ILogger 記錄關鍵操作
+- ✅ **結構化日誌**: 使用 Serilog 實作結構化日誌，透過 ILogger 介面注入
 - ✅ **日誌層級**: 正確使用 Information (正常操作)、Warning (驗證失敗)、Error (檔案存取錯誤)
+- ✅ **日誌輸出**: 主控台 + 檔案 (Logs/log-.txt，按日期滾動)
 - ✅ **關鍵事件記錄**: 記錄 CRUD 操作、驗證失敗、檔案 I/O 錯誤
 - ⚠️ **監控儀表板**: 不實作 (練習用專案，使用主控台日誌即可)
 
@@ -161,8 +165,12 @@ OrderLunchWeb.Tests/              # 測試專案 (待建立)
 ├── Unit/
 │   ├── StoreServiceTests.cs      # StoreService 單元測試
 │   └── JsonFileStorageTests.cs   # JsonFileStorage 單元測試
-└── Integration/
-    └── StoreControllerTests.cs   # StoreController 整合測試
+├── Integration/
+│   └── StoreControllerTests.cs   # StoreController 整合測試
+├── TestHelpers/
+│   ├── TestEnvironment.cs        # 測試環境檢查與設定
+│   └── TestDataHelper.cs         # 測試資料輔助工具
+└── xunit.runner.json             # xUnit 執行設定 (逾時控制)
 ```
 
 **Structure Decision**: 採用標準 ASP.NET Core MVC 單一專案結構，搭配獨立測試專案。選擇此結構的理由:
