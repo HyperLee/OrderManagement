@@ -19,13 +19,13 @@
 
 **目的**: 專案結構建立和基礎設定
 
-- [ ] T001 建立測試專案 OrderLunchWeb.Tests 並新增測試專案參考到方案
-- [ ] T002 安裝測試相依套件到 OrderLunchWeb.Tests: xUnit, xUnit.runner.visualstudio, Microsoft.NET.Test.Sdk, Microsoft.AspNetCore.Mvc.Testing
-- [ ] T003 安裝 Serilog 套件到 OrderLunchWeb: Serilog.AspNetCore, Serilog.Sinks.Console, Serilog.Sinks.File
-- [ ] T004 建立測試專案目錄結構: OrderLunchWeb.Tests/Unit/, OrderLunchWeb.Tests/Integration/, OrderLunchWeb.Tests/TestHelpers/
-- [ ] T005 建立 xunit.runner.json 設定檔在 OrderLunchWeb.Tests/ (單執行緒、逾時控制)
-- [ ] T006 建立 TestHelpers/TestEnvironment.cs (測試環境檢查與臨時檔案管理)
-- [ ] T007 建立 TestHelpers/TestDataHelper.cs (測試資料產生輔助工具)
+- [X] T001 建立測試專案 OrderLunchWeb.Tests 並新增測試專案參考到方案
+- [X] T002 安裝測試相依套件到 OrderLunchWeb.Tests: xUnit, xUnit.runner.visualstudio, Microsoft.NET.Test.Sdk, Microsoft.AspNetCore.Mvc.Testing
+- [X] T003 安裝 Serilog 套件到 OrderLunchWeb: Serilog.AspNetCore, Serilog.Sinks.Console, Serilog.Sinks.File
+- [X] T004 建立測試專案目錄結構: OrderLunchWeb.Tests/Unit/, OrderLunchWeb.Tests/Integration/, OrderLunchWeb.Tests/TestHelpers/
+- [X] T005 建立 xunit.runner.json 設定檔在 OrderLunchWeb.Tests/ (單執行緒、逾時控制)
+- [X] T006 建立 TestHelpers/TestEnvironment.cs (測試環境檢查與臨時檔案管理)
+- [X] T007 建立 TestHelpers/TestDataHelper.cs (測試資料產生輔助工具)
 
 ---
 
