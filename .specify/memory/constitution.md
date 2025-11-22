@@ -121,7 +121,7 @@ Follow-up TODOs:
 - **前端**: Razor Pages/MVC + Bootstrap 5 + jQuery
 - **API 文件**: Swagger/OpenAPI
 - **日誌**: Serilog
-- **測試**: xUnit/NUnit + Moq (單元測試) + WebApplicationFactory (整合測試)
+- **測試**: xUnit + Moq (單元測試) + WebApplicationFactory (整合測試)
 
 ### 專案結構
 
