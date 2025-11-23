@@ -4,8 +4,15 @@ using OrderLunchWeb.Services;
 
 namespace OrderLunchWeb;
 
+/// <summary>
+/// 應用程式主類別
+/// </summary>
 public class Program
 {
+    /// <summary>
+    /// 應用程式入口點
+    /// </summary>
+    /// <param name="args">命令列參數</param>
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);

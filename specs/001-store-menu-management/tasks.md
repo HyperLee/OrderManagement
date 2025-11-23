@@ -169,15 +169,15 @@
 
 **目的**: 影響多個使用者故事的改善項目
 
-- [ ] T053 在所有 Controller Actions 新增業務操作日誌 (使用 ILogger): 記錄 CRUD 操作的開始/成功/失敗、使用者輸入驗證失敗、業務規則違反（如重複店家）、檔案 I/O 錯誤。注意: Serilog 基礎設定已在 T014 完成，此任務僅新增業務層日誌呼叫。
-- [ ] T054 在所有 Views 新增 TempData 成功/錯誤訊息顯示區塊 (Bootstrap alerts)功後顯示「成功訊息」(success alert)，操作失敗顯示「錯誤訊息」(danger alert)
-- [ ] T055 改善 wwwroot/css/site.css 整體樣式 (回應式設計、間距、顏色一致性)
-- [ ] T056 重構重複的驗證邏輯，確保 DRY 原則
-- [ ] T057 執行完整測試套件確認所有測試通過 (dotnet test)
-- [ ] T058 檢查程式碼格式符合 .editorconfig 規範 (格式化所有檔案)
-- [ ] T059 新增 XML 文件註解到所有公開類別、介面、方法
-- [ ] T060 依照 quickstart.md 執行完整使用者流程驗證 (手動測試所有場景)
-- [ ] T061 產生測試覆蓋率報告並確認關鍵路徑 > 80% 覆蓋率
+- [X] T053 在所有 Controller Actions 新增業務操作日誌 (使用 ILogger): 記錄 CRUD 操作的開始/成功/失敗、使用者輸入驗證失敗、業務規則違反（如重複店家）、檔案 I/O 錯誤。注意: Serilog 基礎設定已在 T014 完成，此任務僅新增業務層日誌呼叫。
+- [X] T054 在所有 Views 新增 TempData 成功/錯誤訊息顯示區塊 (Bootstrap alerts)功後顯示「成功訊息」(success alert)，操作失敗顯示「錯誤訊息」(danger alert)
+- [X] T055 改善 wwwroot/css/site.css 整體樣式 (回應式設計、間距、顏色一致性)
+- [X] T056 重構重複的驗證邏輯，確保 DRY 原則
+- [X] T057 執行完整測試套件確認所有測試通過 (dotnet test)
+- [X] T058 檢查程式碼格式符合 .editorconfig 規範 (格式化所有檔案)
+- [X] T059 新增 XML 文件註解到所有公開類別、介面、方法
+- [X] T060 依照 quickstart.md 執行完整使用者流程驗證 (手動測試所有場景)
+- [X] T061 產生測試覆蓋率報告並確認關鍵路徑 > 80% 覆蓋率
 
 ---
 
