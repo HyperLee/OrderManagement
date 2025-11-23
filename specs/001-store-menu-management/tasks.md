@@ -57,11 +57,11 @@
 
 ### 實作 User Story 5
 
-- [ ] T017 [US5] 修改 Views/Home/Index.cshtml 顯示「訂餐系統」標題和即時時間區塊
-- [ ] T018 [US5] 在 Views/Home/Index.cshtml 新增主選單區塊 (店家列表連結、訂購餐點按鈕占位)
-- [ ] T019 [US5] 在 Views/Home/Index.cshtml 的 Scripts section 實作即時時間更新 JavaScript (setInterval, 格式 yyyy/MM/dd HH:mm:ss)
-- [ ] T020 [US5] 修改 Controllers/HomeController.cs Index Action 傳遞伺服器時間到 ViewBag
-- [ ] T021 [US5] 修改 Views/Shared/_Layout.cshtml 導航列，新增「店家列表」選單項目
+- [X] T017 [US5] 修改 Views/Home/Index.cshtml 顯示「訂餐系統」標題和即時時間區塊
+- [X] T018 [US5] 在 Views/Home/Index.cshtml 新增主選單區塊 (店家列表連結、訂購餐點按鈕占位)
+- [X] T019 [US5] 在 Views/Home/Index.cshtml 的 Scripts section 實作即時時間更新 JavaScript (setInterval, 格式 yyyy/MM/dd HH:mm:ss)
+- [X] T020 [US5] 修改 Controllers/HomeController.cs Index Action 傳遞伺服器時間到 ViewBag
+- [X] T021 [US5] 修改 Views/Shared/_Layout.cshtml 導航列，新增「店家列表」選單項目
 
 **Checkpoint**: 首頁功能完整，可獨立測試 (開啟首頁確認標題、時間、選單)
 

@@ -15,6 +15,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        // 傳遞伺服器時間到視圖
+        ViewBag.ServerTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
         return View();
     }
 
