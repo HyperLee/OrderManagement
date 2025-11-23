@@ -992,4 +992,101 @@ public class StoreControllerTests : IDisposable
     }
 
     #endregion
+
+    #region User Story 4 - 刪除店家資訊
+
+    [Fact]
+    [Trait("Category", "US4")]
+    public async Task GetDelete_ShouldReturnView_WhenStoreExists()
+    {
+        // Arrange
+        var store = CreateValidStore("要刪除的店家", "0912345678", "台北市中正區");
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Delete(added.Id);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<Store>(viewResult.Model);
+        Assert.Equal(added.Id, model.Id);
+        Assert.Equal("要刪除的店家", model.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "US4")]
+    public async Task GetDelete_ShouldReturnNotFound_WhenStoreDoesNotExist()
+    {
+        // Arrange
+        var nonExistentId = 9999;
+
+        // Act
+        var result = await _controller.Delete(nonExistentId);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    [Trait("Category", "US4")]
+    public async Task PostDeleteConfirmed_ShouldRedirectToIndex_WhenStoreExists()
+    {
+        // Arrange
+        var store = CreateValidStore("要刪除的店家", "0912345678", "台北市中正區");
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.DeleteConfirmed(added.Id);
+
+        // Assert
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirectResult.ActionName);
+        
+        // 驗證 TempData 包含成功訊息
+        Assert.True(_controller.TempData.ContainsKey("SuccessMessage"));
+        
+        // 驗證店家確實被刪除
+        var deletedStore = await _service.GetStoreByIdAsync(added.Id);
+        Assert.Null(deletedStore);
+    }
+
+    [Fact]
+    [Trait("Category", "US4")]
+    public async Task PostDeleteConfirmed_ShouldReturnNotFound_WhenStoreDoesNotExist()
+    {
+        // Arrange
+        var nonExistentId = 9999;
+
+        // Act
+        var result = await _controller.DeleteConfirmed(nonExistentId);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    [Trait("Category", "US4")]
+    public async Task PostDeleteConfirmed_ShouldNotAffectOtherStores()
+    {
+        // Arrange
+        var store1 = CreateValidStore("店家1", "0912345678", "地址1");
+        var store2 = CreateValidStore("店家2", "0923456789", "地址2");
+        var store3 = CreateValidStore("店家3", "0934567890", "地址3");
+
+        var added1 = await _service.AddStoreAsync(store1);
+        var added2 = await _service.AddStoreAsync(store2);
+        var added3 = await _service.AddStoreAsync(store3);
+
+        // Act - 刪除中間的店家
+        await _controller.DeleteConfirmed(added2.Id);
+
+        // Assert
+        var allStores = await _service.GetAllStoresAsync();
+        Assert.Equal(2, allStores.Count);
+        Assert.Contains(allStores, s => s.Id == added1.Id);
+        Assert.Contains(allStores, s => s.Id == added3.Id);
+        Assert.DoesNotContain(allStores, s => s.Id == added2.Id);
+    }
+
+    #endregion
 }

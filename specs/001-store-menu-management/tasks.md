@@ -151,15 +151,15 @@
 
 ### 測試 User Story 4 (TDD - 先寫測試)
 
-- [ ] T047 [US4] 在 Unit/StoreServiceTests.cs 新增測試: DeleteStoreAsync (成功、不存在的 ID)
-- [ ] T048 [US4] 在 Integration/StoreControllerTests.cs 新增測試: GET Delete (成功、404), POST Delete (成功、404)
+- [X] T047 [US4] 在 Unit/StoreServiceTests.cs 新增測試: DeleteStoreAsync (成功、不存在的 ID)
+- [X] T048 [US4] 在 Integration/StoreControllerTests.cs 新增測試: GET Delete (成功、404), POST Delete (成功、404)
 
 ### 實作 User Story 4
 
-- [ ] T049 [US4] 在 StoreService.cs 實作方法: DeleteStoreAsync
-- [ ] T050 [US4] 在 StoreController.cs 新增 Delete Actions (GET 和 POST, 含確認頁面、404 處理、PRG 模式)
-- [ ] T051 [US4] 建立 Views/Store/Delete.cshtml 刪除確認頁面 (顯示店家資訊、警告訊息、確認和取消按鈕)
-- [ ] T052 [US4] 執行所有 User Story 4 測試確認通過 (dotnet test --filter US4)
+- [X] T049 [US4] 在 StoreService.cs 實作方法: DeleteStoreAsync
+- [X] T050 [US4] 在 StoreController.cs 新增 Delete Actions (GET 和 POST, 含確認頁面、404 處理、PRG 模式)
+- [X] T051 [US4] 建立 Views/Store/Delete.cshtml 刪除確認頁面 (顯示店家資訊、警告訊息、確認和取消按鈕)
+- [X] T052 [US4] 執行所有 User Story 4 測試確認通過 (dotnet test --filter US4)
 
 **Checkpoint**: 刪除店家功能完整，可獨立測試 (刪除店家 → 確認 → 資料移除)
 
