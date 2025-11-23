@@ -77,19 +77,19 @@
 
 > **重要: 先撰寫這些測試，確保它們失敗，然後再實作功能**
 
-- [ ] T022 [US1] 建立 Unit/JsonFileStorageTests.cs 測試檔案並撰寫測試: 初始化、新增店家、ID 自動遞增、UTF-8 編碼
-- [ ] T023 [US1] 建立 Unit/StoreServiceTests.cs 測試檔案並撰寫測試: 新增店家、重複店家檢查、驗證規則
-- [ ] T024 [US1] 建立 Integration/StoreControllerTests.cs 測試檔案並撰寫測試: GET Create、POST Create (成功、驗證失敗、重複店家)
-- [ ] T024-1 [US1] 在 Integration/StoreControllerTests.cs 新增測試: 驗證防重複提交機制（快速連續提交兩次，僅第一次成功儲存，第二次被 PRG 模式阻擋或返回已存在錯誤）
+- [X] T022 [US1] 建立 Unit/JsonFileStorageTests.cs 測試檔案並撰寫測試: 初始化、新增店家、ID 自動遞增、UTF-8 編碼
+- [X] T023 [US1] 建立 Unit/StoreServiceTests.cs 測試檔案並撰寫測試: 新增店家、重複店家檢查、驗證規則
+- [X] T024 [US1] 建立 Integration/StoreControllerTests.cs 測試檔案並撰寫測試: GET Create、POST Create (成功、驗證失敗、重複店家)
+- [X] T024-1 [US1] 在 Integration/StoreControllerTests.cs 新增測試: 驗證防重複提交機制（快速連續提交兩次，僅第一次成功儲存，第二次被 PRG 模式阻擋或返回已存在錯誤）
 
 ### 實作 User Story 1
 
-- [ ] T025 [US1] 實作 StoreService 在 OrderLunchWeb/Services/StoreService.cs: AddStoreAsync, IsDuplicateStoreAsync 方法
-- [ ] T026 [US1] 建立 StoreController 在 OrderLunchWeb/Controllers/StoreController.cs: Create GET 和 POST Actions (含驗證、防重複提交、PRG 模式)
-- [ ] T027 [US1] 建立 Views/Store/Create.cshtml 新增店家表單 (包含所有欄位、客戶端驗證、動態菜單項目)
-- [ ] T028 [US1] 在 wwwroot/js/site.js 實作動態菜單項目管理 JavaScript (新增、移除、最少 1 筆、最多 20 筆限制)
-- [ ] T029 [US1] 在 wwwroot/js/site.js 實作防重複提交 JavaScript (按鈕禁用)
-- [ ] T030 [US1] 執行所有 User Story 1 測試確認通過 (dotnet test --filter US1)
+- [X] T025 [US1] 實作 StoreService 在 OrderLunchWeb/Services/StoreService.cs: AddStoreAsync, IsDuplicateStoreAsync 方法
+- [X] T026 [US1] 建立 StoreController 在 OrderLunchWeb/Controllers/StoreController.cs: Create GET 和 POST Actions (含驗證、防重複提交、PRG 模式)
+- [X] T027 [US1] 建立 Views/Store/Create.cshtml 新增店家表單 (包含所有欄位、客戶端驗證、動態菜單項目)
+- [X] T028 [US1] 在 wwwroot/js/site.js 實作動態菜單項目管理 JavaScript (新增、移除、最少 1 筆、最多 20 筆限制)
+- [X] T029 [US1] 在 wwwroot/js/site.js 實作防重複提交 JavaScript (按鈕禁用)
+- [X] T030 [US1] 執行所有 User Story 1 測試確認通過 (dotnet test --filter US1)
 
 **Checkpoint**: 新增店家功能完整，可獨立測試 (新增店家 → 確認儲存成功)
 
