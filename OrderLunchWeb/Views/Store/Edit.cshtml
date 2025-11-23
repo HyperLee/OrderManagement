@@ -1,0 +1,190 @@
+@model OrderLunchWeb.Models.Store
+
+@{
+    ViewData["Title"] = "編輯店家";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h2 class="mb-4">
+                <i class="bi bi-pencil-square"></i> 編輯店家
+            </h2>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <form asp-action="Edit" method="post" id="editStoreForm">
+                <input type="hidden" asp-for="Id" />
+                
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">店家基本資訊</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 店家名稱 -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold">
+                                店家名稱 <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="請輸入店家名稱（最多 100 字元）" maxlength="100" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- 店家地址 -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-bold">
+                                店家地址 <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Address" class="form-control" placeholder="請輸入完整地址（最多 200 字元）" maxlength="200" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <!-- 電話類型 -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneType" class="form-label fw-bold">
+                                電話類型 <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="PhoneType" asp-items="Html.GetEnumSelectList<OrderLunchWeb.Models.PhoneType>()" 
+                                    class="form-select">
+                                <option value="">請選擇電話類型</option>
+                            </select>
+                            <span asp-validation-for="PhoneType" class="text-danger"></span>
+                        </div>
+
+                        <!-- 聯絡電話 -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold">
+                                聯絡電話 <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Phone" class="form-control" placeholder="請輸入電話號碼（僅數字，例如：0912345678）" 
+                                   pattern="[0-9]+" title="電話號碼僅能輸入數字" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                市話範例：02-12345678 請輸入 0212345678 | 行動電話範例：0912-345-678 請輸入 0912345678
+                            </small>
+                        </div>
+
+                        <!-- 營業時間 -->
+                        <div class="mb-3">
+                            <label asp-for="BusinessHours" class="form-label fw-bold">
+                                營業時間 <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="BusinessHours" class="form-control" 
+                                   placeholder="例如：週一至週五 11:00-14:00, 17:00-21:00" maxlength="100" />
+                            <span asp-validation-for="BusinessHours" class="text-danger"></span>
+                            <small class="form-text text-muted">請輸入營業時段（最多 100 字元）</small>
+                        </div>
+
+                        <!-- 顯示建立和修改時間 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar-plus"></i> 建立時間：@Model.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar-check"></i> 最後修改：@Model.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 菜單項目 -->
+                <div class="card mt-4">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">菜單項目</h5>
+                        <button type="button" class="btn btn-light btn-sm" id="addMenuItemBtn">
+                            <i class="bi bi-plus-circle"></i> 新增菜單項目
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="menuItemsContainer">
+                            @for (int i = 0; i < Model.MenuItems.Count; i++)
+                            {
+                                <div class="menu-item-row mb-3 p-3 border rounded" data-index="@i">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label asp-for="MenuItems[0].Name" class="form-label">
+                                                菜名 <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="MenuItems[@i].Name" class="form-control" 
+                                                   placeholder="例如：排骨便當" maxlength="50" />
+                                            <span asp-validation-for="MenuItems[@i].Name" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label asp-for="MenuItems[0].Price" class="form-label">
+                                                價格 (元) <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="MenuItems[@i].Price" class="form-control" type="number" 
+                                                   min="0" step="1" placeholder="例如：80" />
+                                            <span asp-validation-for="MenuItems[@i].Price" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="MenuItems[0].Description" class="form-label">
+                                                描述 (選填)
+                                            </label>
+                                            <input asp-for="MenuItems[@i].Description" class="form-control" 
+                                                   placeholder="例如：香酥排骨配三菜一飯" maxlength="200" />
+                                            <span asp-validation-for="MenuItems[@i].Description" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-end">
+                                            @if (Model.MenuItems.Count > 1)
+                                            {
+                                                <button type="button" class="btn btn-danger btn-sm remove-menu-item-btn">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle"></i> 至少需要 1 個菜單項目，最多 20 個
+                        </small>
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="mt-4 mb-5">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                        <i class="bi bi-check-circle"></i> 確認更新
+                    </button>
+                    <a asp-controller="Store" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary btn-lg ms-2">
+                        <i class="bi bi-x-circle"></i> 取消
+                    </a>
+                    <a asp-controller="Store" asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">
+                        <i class="bi bi-list"></i> 返回列表
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // 菜單項目管理將在 site.js 中實作
+        // 此處僅包含基本的表單提交防重複邏輯
+    </script>
+}

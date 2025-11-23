@@ -482,3 +482,14 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Application Data (JSON storage)
+Data/
+*.json
+!appsettings*.json
+!package*.json
+!tsconfig*.json
+!project*.json
+!xunit.runner.json
+!.vscode/*.json
+

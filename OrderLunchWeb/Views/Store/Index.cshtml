@@ -1,0 +1,145 @@
+@model List<OrderLunchWeb.Models.Store>
+
+@{
+    ViewData["Title"] = "店家列表";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4">
+            <i class="bi bi-shop"></i> 店家列表
+        </h1>
+        <a asp-action="Create" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i> 新增店家
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle-fill"></i> 
+            目前沒有店家資料，請點擊上方「新增店家」按鈕新增店家。
+        </div>
+    }
+    else
+    {
+        <!-- 搜尋框 (T037) -->
+        <div class="mb-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" 
+                       id="search-input" 
+                       class="form-control" 
+                       placeholder="搜尋店家名稱..." 
+                       aria-label="搜尋店家">
+            </div>
+            <small class="text-muted">
+                共 <span id="store-count">@Model.Count</span> 家店家
+            </small>
+        </div>
+
+        <!-- 店家列表 -->
+        <div class="row" id="store-list">
+            @foreach (var store in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4 store-item" data-name="@store.Name.ToLower()">
+                    <div class="card h-100 shadow-sm hover-shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-shop"></i> @store.Name
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <i class="bi bi-geo-alt-fill text-primary"></i>
+                                <strong>地址：</strong> @store.Address
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-telephone-fill text-primary"></i>
+                                <strong>電話：</strong> 
+                                @(store.PhoneType == OrderLunchWeb.Models.PhoneType.Landline ? "市話" : "行動電話") 
+                                @store.Phone
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-clock-fill text-primary"></i>
+                                <strong>營業時間：</strong> @store.BusinessHours
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-card-list text-primary"></i>
+                                <strong>菜單項目：</strong> @(store.MenuItems?.Count ?? 0) 項
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between">
+                                <a asp-action="Details" asp-route-id="@store.Id" 
+                                   class="btn btn-info btn-sm">
+                                    <i class="bi bi-eye"></i> 查看詳情
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@store.Id" 
+                                   class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil"></i> 編輯
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@store.Id" 
+                                   class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i> 刪除
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // 客戶端即時搜尋功能 (T037)
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const storeItems = document.querySelectorAll('.store-item');
+            const storeCount = document.getElementById('store-count');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    storeItems.forEach(function(item) {
+                        const storeName = item.getAttribute('data-name');
+                        
+                        if (storeName.includes(searchTerm)) {
+                            item.style.display = '';
+                            visibleCount++;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // 更新顯示數量
+                    if (storeCount) {
+                        storeCount.textContent = visibleCount;
+                    }
+                });
+            }
+        });
+    </script>
+}
