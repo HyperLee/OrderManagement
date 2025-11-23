@@ -31,8 +31,8 @@ public interface IStoreService
     /// 更新店家資料
     /// </summary>
     /// <param name="store">要更新的店家物件</param>
-    /// <returns>更新成功返回 true，否則返回 false</returns>
-    Task<bool> UpdateStoreAsync(Store store);
+    /// <returns>更新後的店家物件，若找不到則返回 null</returns>
+    Task<Store?> UpdateStoreAsync(Store store);
 
     /// <summary>
     /// 刪除店家資料

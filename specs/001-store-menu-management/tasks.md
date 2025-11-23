@@ -129,15 +129,15 @@
 
 ### 測試 User Story 3 (TDD - 先寫測試)
 
-- [ ] T041 [US3] 在 Unit/StoreServiceTests.cs 新增測試: UpdateStoreAsync, 修改時間更新, 重複檢查排除自己
-- [ ] T042 [US3] 在 Integration/StoreControllerTests.cs 新增測試: GET Edit (成功、404), POST Edit (成功、驗證失敗、404、重複店家)
+- [X] T041 [US3] 在 Unit/StoreServiceTests.cs 新增測試: UpdateStoreAsync, 修改時間更新, 重複檢查排除自己
+- [X] T042 [US3] 在 Integration/StoreControllerTests.cs 新增測試: GET Edit (成功、404), POST Edit (成功、驗證失敗、404、重複店家)
 
 ### 實作 User Story 3
 
-- [ ] T043 [US3] 在 StoreService.cs 實作方法: UpdateStoreAsync (含修改時間更新、重複檢查排除自己)
-- [ ] T044 [US3] 在 StoreController.cs 新增 Edit Actions (GET 和 POST, 含驗證、404 處理、PRG 模式)
-- [ ] T045 [US3] 建立 Views/Store/Edit.cshtml 編輯店家表單 (預填資料、動態菜單項目、客戶端驗證)
-- [ ] T046 [US3] 執行所有 User Story 3 測試確認通過 (dotnet test --filter US3)
+- [X] T043 [US3] 在 StoreService.cs 實作方法: UpdateStoreAsync (含修改時間更新、重複檢查排除自己)
+- [X] T044 [US3] 在 StoreController.cs 新增 Edit Actions (GET 和 POST, 含驗證、404 處理、PRG 模式)
+- [X] T045 [US3] 建立 Views/Store/Edit.cshtml 編輯店家表單 (預填資料、動態菜單項目、客戶端驗證)
+- [X] T046 [US3] 執行所有 User Story 3 測試確認通過 (dotnet test --filter US3)
 
 **Checkpoint**: 編修店家功能完整，可獨立測試 (編輯店家 → 修改資料 → 確認更新成功)
 

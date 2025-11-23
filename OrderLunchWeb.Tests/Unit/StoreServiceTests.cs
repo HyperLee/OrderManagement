@@ -279,6 +279,176 @@ public class StoreServiceTests : IDisposable
         Assert.Equal(80, retrieved.MenuItems[0].Price);
     }
 
+    #region User Story 3 - 編修店家資訊
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task UpdateStoreAsync_ShouldUpdateStoreSuccessfully_WhenValidStore()
+    {
+        // Arrange
+        var store = CreateTestStore("原始店名", "0912345678", "原始地址");
+        var addedStore = await _service.AddStoreAsync(store);
+        var originalCreatedAt = addedStore.CreatedAt;
+        var originalUpdatedAt = addedStore.UpdatedAt;
+
+        // 等待至少 10ms 確保時間戳不同
+        await Task.Delay(10);
+
+        // 修改店家資訊
+        addedStore.Name = "更新後的店名";
+        addedStore.Address = "更新後的地址";
+        addedStore.Phone = "0923456789";
+
+        // Act
+        var result = await _service.UpdateStoreAsync(addedStore);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("更新後的店名", result.Name);
+        Assert.Equal("更新後的地址", result.Address);
+        Assert.Equal("0923456789", result.Phone);
+        Assert.Equal(originalCreatedAt, result.CreatedAt); // CreatedAt 不應改變
+        Assert.True(result.UpdatedAt > originalUpdatedAt, "UpdatedAt 應該被更新");
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task UpdateStoreAsync_ShouldUpdateTimestamp_WhenStoreIsUpdated()
+    {
+        // Arrange
+        var store = CreateTestStore("店家", "0912345678", "地址");
+        var addedStore = await _service.AddStoreAsync(store);
+        var beforeUpdate = DateTime.Now;
+
+        // 等待至少 10ms 確保時間戳不同
+        await Task.Delay(10);
+
+        addedStore.Name = "更新後的店名";
+
+        // Act
+        var result = await _service.UpdateStoreAsync(addedStore);
+        var afterUpdate = DateTime.Now;
+
+        // Assert
+        Assert.True(result.UpdatedAt >= beforeUpdate && result.UpdatedAt <= afterUpdate);
+        Assert.True(result.UpdatedAt > result.CreatedAt, "UpdatedAt 應該晚於 CreatedAt");
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task UpdateStoreAsync_ShouldReturnNull_WhenStoreDoesNotExist()
+    {
+        // Arrange
+        var nonExistentStore = CreateTestStore("不存在的店家", "0912345678", "地址");
+        nonExistentStore.Id = 999;
+
+        // Act
+        var result = await _service.UpdateStoreAsync(nonExistentStore);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task IsDuplicateStoreAsync_ShouldExcludeSelfWhenChecking_ForUpdate()
+    {
+        // Arrange
+        var store1 = CreateTestStore("便當店A", "0912345678", "台北市中正區");
+        var store2 = CreateTestStore("便當店B", "0923456789", "台北市大安區");
+        var addedStore1 = await _service.AddStoreAsync(store1);
+        await _service.AddStoreAsync(store2);
+
+        // Act - 更新 store1，但名稱、電話、地址都不變（編輯其他欄位）
+        var isDuplicate = await _service.IsDuplicateStoreAsync(
+            "便當店A", 
+            "0912345678", 
+            "台北市中正區", 
+            addedStore1.Id);
+
+        // Assert
+        Assert.False(isDuplicate, "更新自己時，不應判定為重複");
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task IsDuplicateStoreAsync_ShouldReturnTrueWhenConflictWithOther_ForUpdate()
+    {
+        // Arrange
+        var store1 = CreateTestStore("便當店A", "0912345678", "台北市中正區");
+        var store2 = CreateTestStore("便當店B", "0923456789", "台北市大安區");
+        var addedStore1 = await _service.AddStoreAsync(store1);
+        var addedStore2 = await _service.AddStoreAsync(store2);
+
+        // Act - 嘗試將 store1 更新為與 store2 相同的資訊
+        var isDuplicate = await _service.IsDuplicateStoreAsync(
+            "便當店B", 
+            "0923456789", 
+            "台北市大安區", 
+            addedStore1.Id);
+
+        // Assert
+        Assert.True(isDuplicate, "更新後與其他店家重複時，應判定為重複");
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task UpdateStoreAsync_ShouldUpdateMenuItems_WhenMenuItemsChanged()
+    {
+        // Arrange
+        var store = CreateTestStore("便當店", "0912345678", "地址");
+        store.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "排骨便當", Price = 80 },
+            new MenuItem { Name = "雞腿便當", Price = 90 }
+        };
+        var addedStore = await _service.AddStoreAsync(store);
+
+        // 修改菜單
+        addedStore.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "排骨便當", Price = 85 }, // 價格改變
+            new MenuItem { Name = "雞腿便當", Price = 95 }, // 價格改變
+            new MenuItem { Name = "魚便當", Price = 100 }   // 新增項目
+        };
+
+        // Act
+        var result = await _service.UpdateStoreAsync(addedStore);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(3, result.MenuItems.Count);
+        Assert.Equal(85, result.MenuItems[0].Price);
+        Assert.Equal(95, result.MenuItems[1].Price);
+        Assert.Equal("魚便當", result.MenuItems[2].Name);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task UpdateStoreAsync_ShouldPreserveCreatedAt_WhenStoreIsUpdated()
+    {
+        // Arrange
+        var store = CreateTestStore("店家", "0912345678", "地址");
+        var addedStore = await _service.AddStoreAsync(store);
+        var originalCreatedAt = addedStore.CreatedAt;
+
+        await Task.Delay(10);
+
+        // 修改店家資訊
+        addedStore.Name = "新店名";
+        addedStore.Address = "新地址";
+        addedStore.BusinessHours = "週一至週日 10:00-22:00";
+
+        // Act
+        var result = await _service.UpdateStoreAsync(addedStore);
+
+        // Assert
+        Assert.Equal(originalCreatedAt, result.CreatedAt);
+        Assert.True(result.UpdatedAt > originalCreatedAt);
+    }
+
+    #endregion
+
     /// <summary>
     /// 輔助方法：建立測試用的店家物件
     /// </summary>

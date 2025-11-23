@@ -678,4 +678,318 @@ public class StoreControllerTests : IDisposable
     }
 
     #endregion
+
+    #region GET Edit Tests (T042 - User Story 3)
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task GetEdit_ShouldReturnNotFound_WhenStoreDoesNotExist()
+    {
+        // Act
+        var result = await _controller.Edit(999);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task GetEdit_ShouldReturnViewResult_WithStore_WhenStoreExists()
+    {
+        // Arrange
+        var store = CreateValidStore("測試店家", "0912345678", "測試地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Edit(added.Id);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<Store>(viewResult.Model);
+        Assert.Equal(added.Id, model.Id);
+        Assert.Equal("測試店家", model.Name);
+        Assert.Equal("0912345678", model.Phone);
+        Assert.Equal("測試地址", model.Address);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task GetEdit_ShouldReturnStoreWithMenuItems()
+    {
+        // Arrange
+        var store = CreateValidStore("有菜單的店", "0912345678", "地址");
+        store.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "套餐A", Price = 100 },
+            new MenuItem { Name = "套餐B", Price = 120 }
+        };
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Edit(added.Id);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<Store>(viewResult.Model);
+        Assert.Equal(2, model.MenuItems.Count);
+        Assert.Equal("套餐A", model.MenuItems[0].Name);
+        Assert.Equal(100, model.MenuItems[0].Price);
+    }
+
+    #endregion
+
+    #region POST Edit - Success Tests (T042 - User Story 3)
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldRedirectToIndex_WhenUpdateIsSuccessful()
+    {
+        // Arrange
+        var store = CreateValidStore("原始店名", "0912345678", "原始地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // 修改店家資訊
+        added.Name = "更新後的店名";
+        added.Address = "更新後的地址";
+        added.Phone = "0923456789";
+        TriggerModelValidation(added);
+
+        // Act
+        var result = await _controller.Edit(added.Id, added);
+
+        // Assert
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirectResult.ActionName);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldUpdateStore_WhenModelIsValid()
+    {
+        // Arrange
+        var store = CreateValidStore("舊店名", "0912345678", "舊地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // 修改店家資訊
+        added.Name = "新店名";
+        added.Address = "新地址";
+        added.BusinessHours = "週一至週日 10:00-22:00";
+        TriggerModelValidation(added);
+
+        // Act
+        await _controller.Edit(added.Id, added);
+
+        // Assert - 驗證資料確實被更新
+        var updated = await _service.GetStoreByIdAsync(added.Id);
+        Assert.NotNull(updated);
+        Assert.Equal("新店名", updated.Name);
+        Assert.Equal("新地址", updated.Address);
+        Assert.Equal("週一至週日 10:00-22:00", updated.BusinessHours);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldSetSuccessMessage_WhenUpdateSucceeds()
+    {
+        // Arrange
+        var store = CreateValidStore("店家", "0912345678", "地址");
+        var added = await _service.AddStoreAsync(store);
+
+        added.Name = "新店名";
+        TriggerModelValidation(added);
+
+        // Act
+        await _controller.Edit(added.Id, added);
+
+        // Assert
+        Assert.True(_controller.TempData.ContainsKey("SuccessMessage"));
+        Assert.Contains("新店名", _controller.TempData["SuccessMessage"]?.ToString());
+    }
+
+    #endregion
+
+    #region POST Edit - Validation Failure Tests (T042 - User Story 3)
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldReturnView_WhenModelStateIsInvalid()
+    {
+        // Arrange
+        var store = CreateValidStore("店家", "0912345678", "地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // 設定無效資料（空店名）
+        added.Name = "";
+        _controller.ModelState.AddModelError("Name", "店家名稱為必填欄位");
+
+        // Act
+        var result = await _controller.Edit(added.Id, added);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.IsType<Store>(viewResult.Model);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldReturnView_WhenPhoneIsInvalid()
+    {
+        // Arrange
+        var store = CreateValidStore("店家", "0912345678", "地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // 設定無效的電話號碼（包含非數字字元）
+        added.Phone = "0912-345-678";
+        TriggerModelValidation(added);
+
+        // Act
+        var result = await _controller.Edit(added.Id, added);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldReturnView_WhenMenuItemsExceedLimit()
+    {
+        // Arrange
+        var store = CreateValidStore("店家", "0912345678", "地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // 新增超過 20 個菜單項目
+        added.MenuItems = Enumerable.Range(1, 21)
+            .Select(i => new MenuItem { Name = $"菜單{i}", Price = 100 })
+            .ToList();
+        TriggerModelValidation(added);
+
+        // Act
+        var result = await _controller.Edit(added.Id, added);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+    }
+
+    #endregion
+
+    #region POST Edit - 404 Tests (T042 - User Story 3)
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldReturnNotFound_WhenStoreDoesNotExist()
+    {
+        // Arrange
+        var store = CreateValidStore("不存在的店", "0912345678", "地址");
+        store.Id = 999;
+        TriggerModelValidation(store);
+
+        // Act
+        var result = await _controller.Edit(999, store);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldReturnBadRequest_WhenIdMismatch()
+    {
+        // Arrange
+        var store = CreateValidStore("店家", "0912345678", "地址");
+        var added = await _service.AddStoreAsync(store);
+        TriggerModelValidation(added);
+
+        // Act - URL ID 與 Model ID 不一致
+        var result = await _controller.Edit(999, added);
+
+        // Assert
+        Assert.IsType<BadRequestResult>(result);
+    }
+
+    #endregion
+
+    #region POST Edit - Duplicate Store Tests (T042 - User Story 3)
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldReturnView_WhenUpdatingToDuplicateStore()
+    {
+        // Arrange - 新增兩家不同的店
+        var store1 = CreateValidStore("便當店A", "0912345678", "台北市中正區");
+        var store2 = CreateValidStore("便當店B", "0923456789", "台北市大安區");
+        var added1 = await _service.AddStoreAsync(store1);
+        var added2 = await _service.AddStoreAsync(store2);
+
+        // 嘗試將 store1 更新為與 store2 相同的資訊
+        added1.Name = "便當店B";
+        added1.Phone = "0923456789";
+        added1.Address = "台北市大安區";
+        TriggerModelValidation(added1);
+
+        // Act
+        var result = await _controller.Edit(added1.Id, added1);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(""));
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldSucceed_WhenUpdatingOwnInformationWithoutChangingUniqueFields()
+    {
+        // Arrange
+        var store = CreateValidStore("便當店", "0912345678", "台北市中正區");
+        var added = await _service.AddStoreAsync(store);
+
+        // 只修改營業時間，名稱、電話、地址保持不變
+        added.BusinessHours = "週一至週日 09:00-21:00";
+        TriggerModelValidation(added);
+
+        // Act
+        var result = await _controller.Edit(added.Id, added);
+
+        // Assert
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirectResult.ActionName);
+    }
+
+    [Fact]
+    [Trait("Category", "US3")]
+    public async Task PostEdit_ShouldUpdateMenuItems_WhenMenuChanged()
+    {
+        // Arrange
+        var store = CreateValidStore("便當店", "0912345678", "地址");
+        store.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "排骨便當", Price = 80 },
+            new MenuItem { Name = "雞腿便當", Price = 90 }
+        };
+        var added = await _service.AddStoreAsync(store);
+
+        // 修改菜單
+        added.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "排骨便當", Price = 85 },    // 價格改變
+            new MenuItem { Name = "雞腿便當", Price = 95 },    // 價格改變
+            new MenuItem { Name = "魚便當", Price = 100 }      // 新增項目
+        };
+        TriggerModelValidation(added);
+
+        // Act
+        await _controller.Edit(added.Id, added);
+
+        // Assert
+        var updated = await _service.GetStoreByIdAsync(added.Id);
+        Assert.NotNull(updated);
+        Assert.Equal(3, updated.MenuItems.Count);
+        Assert.Equal(85, updated.MenuItems[0].Price);
+        Assert.Equal("魚便當", updated.MenuItems[2].Name);
+    }
+
+    #endregion
 }

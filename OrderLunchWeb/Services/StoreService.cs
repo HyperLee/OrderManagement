@@ -64,13 +64,13 @@ public class StoreService : IStoreService
     /// <summary>
     /// 更新店家資料
     /// </summary>
-    public async Task<bool> UpdateStoreAsync(Store store)
+    public async Task<Store?> UpdateStoreAsync(Store store)
     {
         _logger.LogInformation("開始更新店家，ID: {StoreId}, 名稱: {StoreName}", store.Id, store.Name);
         
         var result = await _fileStorage.UpdateAsync(store);
         
-        if (result)
+        if (result is not null)
         {
             _logger.LogInformation("成功更新店家，ID: {StoreId}", store.Id);
         }

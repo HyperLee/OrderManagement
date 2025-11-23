@@ -202,7 +202,7 @@ public class StoreController : Controller
         {
             var result = await _storeService.UpdateStoreAsync(store);
 
-            if (!result)
+            if (result is null)
             {
                 _logger.LogWarning("找不到要更新的店家，ID: {StoreId}", id);
                 return NotFound();
