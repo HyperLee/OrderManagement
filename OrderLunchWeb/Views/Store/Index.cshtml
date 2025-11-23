@@ -1,0 +1,66 @@
+@model IEnumerable<OrderLunchWeb.Models.Store>
+
+@{
+    ViewData["Title"] = "店家列表";
+}
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h1 class="display-4">@ViewData["Title"]</h1>
+        </div>
+        <div class="col text-end">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> 新增店家
+            </a>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i> 目前沒有店家資料。
+            <a asp-action="Create" class="alert-link">立即新增</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var store in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@store.Name</h5>
+                            <hr />
+                            <p class="card-text">
+                                <strong>電話：</strong>@store.Phone<br />
+                                <strong>地址：</strong>@store.Address<br />
+                                <strong>菜單項目：</strong>@(store.MenuItems?.Count ?? 0) 項
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group w-100" role="group">
+                                <a asp-action="Details" asp-route-id="@store.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> 詳情
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@store.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> 編輯
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@store.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> 刪除
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // 可以在這裡加入 JavaScript 互動功能
+    </script>
+}
