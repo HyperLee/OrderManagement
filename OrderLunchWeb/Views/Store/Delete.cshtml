@@ -155,7 +155,8 @@
     <script>
         // 刪除確認的額外提示
         document.querySelector('form').addEventListener('submit', function(e) {
-            const confirmed = confirm('您確定要刪除「@Model.Name」嗎？此操作無法復原！');
+            const storeName = '@Html.Raw(Model.Name)';
+            const confirmed = confirm(`您確定要刪除「${storeName}」嗎？此操作無法復原！`);
             if (!confirmed) {
                 e.preventDefault();
             }
