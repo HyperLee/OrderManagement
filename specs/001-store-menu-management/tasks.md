@@ -103,19 +103,19 @@
 
 ### 測試 User Story 2 (TDD - 先寫測試)
 
-- [ ] T031 [US2] 在 Unit/StoreServiceTests.cs 新增測試: GetAllStoresAsync, GetStoreByIdAsync, 搜尋功能
-- [ ] T032 [US2] 在 Integration/StoreControllerTests.cs 新增測試: GET Index (有資料、無資料), GET Details (成功、404)
+- [X] T031 [US2] 在 Unit/StoreServiceTests.cs 新增測試: GetAllStoresAsync, GetStoreByIdAsync, 搜尋功能
+- [X] T032 [US2] 在 Integration/StoreControllerTests.cs 新增測試: GET Index (有資料、無資料), GET Details (成功、404)
 
 ### 實作 User Story 2
 
-- [ ] T033 [US2] 在 StoreService.cs 實作方法: GetAllStoresAsync, GetStoreByIdAsync
-- [ ] T034 [US2] 在 StoreController.cs 新增 Index Action (GET, 回傳所有店家)
-- [ ] T035 [US2] 在 StoreController.cs 新增 Details Action (GET, 依 ID 查詢, 404 處理)
-- [ ] T036 [US2] 建立 Views/Store/Index.cshtml 店家列表頁面 (顯示所有店家、搜尋框、新增按鈕、操作連結)
-- [ ] T037 [US2] 在 wwwroot/js/site.js 實作客戶端即時搜尋 JavaScript (根據店家名稱篩選)
-- [ ] T038 [US2] 建立 Views/Store/Details.cshtml 店家詳情頁面 (顯示完整資訊、菜單列表、操作按鈕)
-- [ ] T039 [US2] 在 wwwroot/css/site.css 新增店家列表和詳情頁面樣式
-- [ ] T040 [US2] 執行所有 User Story 2 測試確認通過 (dotnet test --filter US2)
+- [X] T033 [US2] 在 StoreService.cs 實作方法: GetAllStoresAsync, GetStoreByIdAsync
+- [X] T034 [US2] 在 StoreController.cs 新增 Index Action (GET, 回傳所有店家)
+- [X] T035 [US2] 在 StoreController.cs 新增 Details Action (GET, 依 ID 查詢, 404 處理)
+- [X] T036 [US2] 建立 Views/Store/Index.cshtml 店家列表頁面 (顯示所有店家、搜尋框、新增按鈕、操作連結)
+- [X] T037 [US2] 在 wwwroot/js/site.js 實作客戶端即時搜尋 JavaScript (根據店家名稱篩選)
+- [X] T038 [US2] 建立 Views/Store/Details.cshtml 店家詳情頁面 (顯示完整資訊、菜單列表、操作按鈕)
+- [X] T039 [US2] 在 wwwroot/css/site.css 新增店家列表和詳情頁面樣式
+- [X] T040 [US2] 執行所有 User Story 2 測試確認通過 (dotnet test --filter US2)
 
 **Checkpoint**: 瀏覽店家功能完整，可獨立測試 (列表顯示 → 搜尋 → 查看詳情)
 

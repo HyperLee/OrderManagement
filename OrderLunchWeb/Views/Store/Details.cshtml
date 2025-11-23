@@ -1,0 +1,177 @@
+@model OrderLunchWeb.Models.Store
+
+@{
+    ViewData["Title"] = "店家詳情";
+}
+
+<div class="container mt-4">
+    <!-- 標題與操作按鈕 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4">
+            <i class="bi bi-shop-window"></i> 店家詳情
+        </h1>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> 返回列表
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> 編輯
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                <i class="bi bi-trash"></i> 刪除
+            </a>
+        </div>
+    </div>
+
+    <!-- 店家基本資訊卡片 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-shop"></i> @Model.Name
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="info-item">
+                        <h5 class="text-muted mb-2">
+                            <i class="bi bi-geo-alt-fill"></i> 地址
+                        </h5>
+                        <p class="fs-5">@Model.Address</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="info-item">
+                        <h5 class="text-muted mb-2">
+                            <i class="bi bi-telephone-fill"></i> 聯絡電話
+                        </h5>
+                        <p class="fs-5">
+                            @(Model.PhoneType == OrderLunchWeb.Models.PhoneType.Landline ? "市話" : "行動電話")：@Model.Phone
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="info-item">
+                        <h5 class="text-muted mb-2">
+                            <i class="bi bi-clock-fill"></i> 營業時間
+                        </h5>
+                        <p class="fs-5">@Model.BusinessHours</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="info-item">
+                        <h5 class="text-muted mb-2">
+                            <i class="bi bi-card-list"></i> 菜單項目數量
+                        </h5>
+                        <p class="fs-5">@Model.MenuItems.Count 項</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="info-item">
+                        <h5 class="text-muted mb-2">
+                            <i class="bi bi-calendar-plus"></i> 建立時間
+                        </h5>
+                        <p class="fs-6">@Model.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="info-item">
+                        <h5 class="text-muted mb-2">
+                            <i class="bi bi-calendar-check"></i> 最後更新時間
+                        </h5>
+                        <p class="fs-6">@Model.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 菜單項目列表 -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-card-list"></i> 菜單項目
+            </h3>
+        </div>
+        <div class="card-body">
+            @if (Model.MenuItems == null || !Model.MenuItems.Any())
+            {
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> 此店家尚未新增菜單項目。
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-success">
+                            <tr>
+                                <th scope="col" style="width: 5%">#</th>
+                                <th scope="col" style="width: 30%">
+                                    <i class="bi bi-egg-fried"></i> 餐點名稱
+                                </th>
+                                <th scope="col" style="width: 15%">
+                                    <i class="bi bi-currency-dollar"></i> 價格
+                                </th>
+                                <th scope="col" style="width: 50%">
+                                    <i class="bi bi-info-circle"></i> 說明
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.MenuItems.Count; i++)
+                            {
+                                var item = Model.MenuItems[i];
+                                <tr>
+                                    <th scope="row">@(i + 1)</th>
+                                    <td>
+                                        <strong>@item.Name</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success fs-6">
+                                            NT$ @item.Price
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                                        {
+                                            <span>@item.Description</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic">無說明</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end">
+                                    <strong>菜單項目總數：@Model.MenuItems.Count 項</strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 操作按鈕區域 -->
+    <div class="mt-4 mb-5 text-center">
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> 返回列表
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+            <i class="bi bi-pencil"></i> 編輯店家
+        </a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">
+            <i class="bi bi-trash"></i> 刪除店家
+        </a>
+    </div>
+</div>

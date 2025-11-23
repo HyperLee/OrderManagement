@@ -532,4 +532,150 @@ public class StoreControllerTests : IDisposable
     }
 
     #endregion
+
+    #region GET Index Tests (T032 - User Story 2)
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetIndex_ShouldReturnViewResult_WithEmptyList_WhenNoStores()
+    {
+        // Act
+        var result = await _controller.Index();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<List<Store>>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Empty(model);
+    }
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetIndex_ShouldReturnViewResult_WithStoreList_WhenStoresExist()
+    {
+        // Arrange
+        var store1 = CreateValidStore("便當店A", "0912345678", "台北市");
+        var store2 = CreateValidStore("便當店B", "0923456789", "新北市");
+        var store3 = CreateValidStore("便當店C", "0934567890", "桃園市");
+
+        await _service.AddStoreAsync(store1);
+        await _service.AddStoreAsync(store2);
+        await _service.AddStoreAsync(store3);
+
+        // Act
+        var result = await _controller.Index();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<List<Store>>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(3, model.Count);
+        Assert.Contains(model, s => s.Name == "便當店A");
+        Assert.Contains(model, s => s.Name == "便當店B");
+        Assert.Contains(model, s => s.Name == "便當店C");
+    }
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetIndex_ShouldReturnStoresWithCompleteData_IncludingMenuItems()
+    {
+        // Arrange
+        var store = CreateValidStore("測試餐廳", "0912345678", "測試地址");
+        store.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "餐點1", Price = 80, Description = "描述1" },
+            new MenuItem { Name = "餐點2", Price = 90, Description = "描述2" }
+        };
+        await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Index();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<List<Store>>(viewResult.Model);
+        Assert.Single(model);
+        Assert.Equal(2, model[0].MenuItems.Count);
+    }
+
+    #endregion
+
+    #region GET Details Tests (T032 - User Story 2)
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetDetails_ShouldReturnNotFound_WhenStoreDoesNotExist()
+    {
+        // Act
+        var result = await _controller.Details(999);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetDetails_ShouldReturnViewResult_WithStore_WhenStoreExists()
+    {
+        // Arrange
+        var store = CreateValidStore("好吃便當店", "0912345678", "台北市中正區羅斯福路一段100號");
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Details(added.Id);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<Store>(viewResult.Model);
+        Assert.Equal(added.Id, model.Id);
+        Assert.Equal("好吃便當店", model.Name);
+        Assert.Equal("0912345678", model.Phone);
+        Assert.Equal("台北市中正區羅斯福路一段100號", model.Address);
+    }
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetDetails_ShouldReturnStoreWithMenuItems_WhenStoreHasMenu()
+    {
+        // Arrange
+        var store = CreateValidStore("美味餐廳", "0923456789", "新北市板橋區");
+        store.MenuItems = new List<MenuItem>
+        {
+            new MenuItem { Name = "牛肉麵", Price = 120, Description = "香濃好吃" },
+            new MenuItem { Name = "排骨飯", Price = 90, Description = "肉質鮮嫩" },
+            new MenuItem { Name = "雞腿飯", Price = 100, Description = "外酥內嫩" }
+        };
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Details(added.Id);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<Store>(viewResult.Model);
+        Assert.Equal(3, model.MenuItems.Count);
+        Assert.Equal("牛肉麵", model.MenuItems[0].Name);
+        Assert.Equal(120, model.MenuItems[0].Price);
+        Assert.Equal("香濃好吃", model.MenuItems[0].Description);
+    }
+
+    [Fact]
+    [Trait("Category", "US2")]
+    public async Task GetDetails_ShouldReturnStoreWithTimestamps()
+    {
+        // Arrange
+        var store = CreateValidStore("時間測試店", "0912345678", "測試地址");
+        var added = await _service.AddStoreAsync(store);
+
+        // Act
+        var result = await _controller.Details(added.Id);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsType<Store>(viewResult.Model);
+        Assert.NotEqual(default, model.CreatedAt);
+        Assert.NotEqual(default, model.UpdatedAt);
+    }
+
+    #endregion
 }

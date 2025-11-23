@@ -180,6 +180,7 @@ public class StoreServiceTests : IDisposable
 
     [Fact]
     [Trait("Category", "US1")]
+    [Trait("Category", "US2")]
     public async Task GetAllStoresAsync_ShouldReturnAllStores_WhenMultipleStoresExist()
     {
         // Arrange
@@ -196,6 +197,7 @@ public class StoreServiceTests : IDisposable
 
     [Fact]
     [Trait("Category", "US1")]
+    [Trait("Category", "US2")]
     public async Task GetStoreByIdAsync_ShouldReturnStore_WhenStoreExists()
     {
         // Arrange
@@ -212,6 +214,7 @@ public class StoreServiceTests : IDisposable
 
     [Fact]
     [Trait("Category", "US1")]
+    [Trait("Category", "US2")]
     public async Task GetStoreByIdAsync_ShouldReturnNull_WhenStoreDoesNotExist()
     {
         // Act
