@@ -162,8 +162,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T049 [US6] 更新 SelectRestaurant Action 查詢進行中訂單於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T050 [US6] 更新 SelectRestaurant.cshtml 新增進行中訂單提示區塊於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
+- [x] T049 [US6] 更新 SelectRestaurant Action 查詢進行中訂單於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T050 [US6] 更新 SelectRestaurant.cshtml 新增進行中訂單提示區塊於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
 
 **Checkpoint**: User Story 6 完成後，進行中訂單提示功能應正常運作
 
