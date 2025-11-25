@@ -7,9 +7,8 @@
 
 **Organization**: 任務按使用者故事分組，以支援各故事的獨立實作和測試。
 
-## Format: `[ID] [P?] [Story] Description`
+## Format: `[ID] [Story?] Description`
 
-- **[P]**: 可平行執行（不同檔案，無相依性）
 - **[Story]**: 此任務所屬的使用者故事（如 US1, US2, US3）
 - 描述中包含確切的檔案路徑
 
@@ -28,8 +27,8 @@
 - [ ] T001 建立訂單相關模型檔案結構：建立 `OrderLunchWeb/Models/Order.cs`, `OrderLunchWeb/Models/OrderItem.cs`, `OrderLunchWeb/Models/OrderStatus.cs`
 - [ ] T002 建立訂單服務介面和實作檔案結構：建立 `OrderLunchWeb/Services/IOrderService.cs`, `OrderLunchWeb/Services/OrderService.cs`
 - [ ] T003 建立訂單視圖資料夾結構：建立 `OrderLunchWeb/Views/Order/` 資料夾
-- [ ] T004 [P] 建立訂單資料儲存檔案：建立 `OrderLunchWeb/Data/orders.json`（空陣列初始內容）
-- [ ] T005 [P] 建立前端 JavaScript 檔案：建立 `OrderLunchWeb/wwwroot/js/order.js`
+- [ ] T004 建立訂單資料儲存檔案：建立 `OrderLunchWeb/Data/orders.json`（空陣列初始內容）
+- [ ] T005 建立前端 JavaScript 檔案：建立 `OrderLunchWeb/wwwroot/js/order.js`
 
 ---
 
@@ -40,11 +39,11 @@
 **⚠️ 重要**: 本階段完成前，任何使用者故事都無法開始
 
 - [ ] T006 實作 OrderStatus 列舉模型於 `OrderLunchWeb/Models/OrderStatus.cs`
-- [ ] T007 [P] 實作 OrderItem 模型（含快照欄位和驗證）於 `OrderLunchWeb/Models/OrderItem.cs`
-- [ ] T008 [P] 實作 Order 模型（含驗證屬性和計算屬性）於 `OrderLunchWeb/Models/Order.cs`
-- [ ] T009 [P] 實作 CheckoutViewModel 視圖模型於 `OrderLunchWeb/Models/CheckoutViewModel.cs`
-- [ ] T010 [P] 實作 OrderHistoryViewModel 視圖模型於 `OrderLunchWeb/Models/OrderHistoryViewModel.cs`
-- [ ] T011 [P] 實作 CartDto 和 CartItemDto 資料傳輸物件於 `OrderLunchWeb/Models/CartDto.cs`
+- [ ] T007 實作 OrderItem 模型（含快照欄位和驗證）於 `OrderLunchWeb/Models/OrderItem.cs`
+- [ ] T008 實作 Order 模型（含驗證屬性和計算屬性）於 `OrderLunchWeb/Models/Order.cs`
+- [ ] T009 實作 CheckoutViewModel 視圖模型於 `OrderLunchWeb/Models/CheckoutViewModel.cs`
+- [ ] T010 實作 OrderHistoryViewModel 視圖模型於 `OrderLunchWeb/Models/OrderHistoryViewModel.cs`
+- [ ] T011 實作 CartDto 和 CartItemDto 資料傳輸物件於 `OrderLunchWeb/Models/CartDto.cs`
 - [ ] T012 定義 IOrderService 介面（含所有方法簽名）於 `OrderLunchWeb/Services/IOrderService.cs`
 - [ ] T013 實作 OrderService 服務（訂單建立、查詢、清理邏輯）於 `OrderLunchWeb/Services/OrderService.cs`
 - [ ] T014 更新 Program.cs 註冊 IOrderService 和 OrderService 至 DI 容器於 `OrderLunchWeb/Program.cs`
@@ -63,8 +62,8 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [P] [US1] 建立 OrderService 單元測試於 `OrderLunchWeb.Tests/Unit/OrderServiceTests.cs`
-- [ ] T018 [P] [US1] 建立 OrderController 整合測試於 `OrderLunchWeb.Tests/Integration/OrderControllerTests.cs`
+- [ ] T017 [US1] 建立 OrderService 單元測試於 `OrderLunchWeb.Tests/Unit/OrderServiceTests.cs`
+- [ ] T018 [US1] 建立 OrderController 整合測試於 `OrderLunchWeb.Tests/Integration/OrderControllerTests.cs`
 
 ### Implementation for User Story 1
 
@@ -74,10 +73,10 @@
 - [ ] T022 [US1] 實作 Checkout Action（結帳頁面 GET）於 `OrderLunchWeb/Controllers/OrderController.cs`
 - [ ] T023 [US1] 實作 Submit Action（提交訂單 POST）於 `OrderLunchWeb/Controllers/OrderController.cs`
 - [ ] T024 [US1] 實作 Confirmation Action（訂單確認頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T025 [P] [US1] 建立 SelectRestaurant.cshtml 視圖（餐廳列表）於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
-- [ ] T026 [P] [US1] 建立 Menu.cshtml 視圖（菜單頁面含訂單摘要區塊）於 `OrderLunchWeb/Views/Order/Menu.cshtml`
-- [ ] T027 [P] [US1] 建立 Checkout.cshtml 視圖（結帳頁面含表單驗證）於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
-- [ ] T028 [P] [US1] 建立 Confirmation.cshtml 視圖（訂單確認頁面）於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
+- [ ] T025 [US1] 建立 SelectRestaurant.cshtml 視圖（餐廳列表）於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
+- [ ] T026 [US1] 建立 Menu.cshtml 視圖（菜單頁面含訂單摘要區塊）於 `OrderLunchWeb/Views/Order/Menu.cshtml`
+- [ ] T027 [US1] 建立 Checkout.cshtml 視圖（結帳頁面含表單驗證）於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
+- [ ] T028 [US1] 建立 Confirmation.cshtml 視圖（訂單確認頁面）於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
 - [ ] T029 [US1] 更新首頁新增「訂購餐點」按鈕於 `OrderLunchWeb/Views/Home/Index.cshtml`
 - [ ] T030 [US1] 實作前端「加入訂單」功能函式於 `OrderLunchWeb/wwwroot/js/order.js`
 - [ ] T031 [US1] 實作前端「前往結帳」功能函式於 `OrderLunchWeb/wwwroot/js/order.js`
@@ -112,7 +111,7 @@
 ### Implementation for User Story 3
 
 - [ ] T036 [US3] 實作前端數量增減按鈕邏輯（+/- 按鈕）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T037 [US3] 實作前端數量輸入驗證（正整數檢查、範圍限制）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [ ] T037 [US3] 實作前端數量輸入驗證（正整數檢查、範圍 1-100 限制）於 `OrderLunchWeb/wwwroot/js/order.js`
 - [ ] T038 [US3] 實作前端無效數量自動修正邏輯於 `OrderLunchWeb/wwwroot/js/order.js`
 - [ ] T039 [US3] 更新 Menu.cshtml 數量選擇器 UI 元件於 `OrderLunchWeb/Views/Order/Menu.cshtml`
 
@@ -147,8 +146,8 @@
 
 - [ ] T044 [US5] 實作 History Action（訂單紀錄頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
 - [ ] T045 [US5] 實作 Details Action（訂單詳情頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T046 [P] [US5] 建立 History.cshtml 視圖（訂單紀錄清單）於 `OrderLunchWeb/Views/Order/History.cshtml`
-- [ ] T047 [P] [US5] 建立 Details.cshtml 視圖（訂單詳情頁面）於 `OrderLunchWeb/Views/Order/Details.cshtml`
+- [ ] T046 [US5] 建立 History.cshtml 視圖（訂單紀錄清單）於 `OrderLunchWeb/Views/Order/History.cshtml`
+- [ ] T047 [US5] 建立 Details.cshtml 視圖（訂單詳情頁面）於 `OrderLunchWeb/Views/Order/Details.cshtml`
 - [ ] T048 [US5] 更新 Confirmation.cshtml 新增「查看訂單紀錄」連結於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
 
 **Checkpoint**: User Story 5 完成後，使用者應可查看訂單歷史紀錄
@@ -189,13 +188,14 @@
 
 **Purpose**: 邊界情況處理和跨功能改善
 
-- [ ] T053 [P] 實作無餐廳資料時的空狀態顯示於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
-- [ ] T054 [P] 實作空菜單時的空狀態顯示於 `OrderLunchWeb/Views/Order/Menu.cshtml`
-- [ ] T055 [P] 實作無訂單紀錄時的空狀態顯示於 `OrderLunchWeb/Views/Order/History.cshtml`
+- [ ] T053 實作無餐廳資料時的空狀態顯示於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
+- [ ] T054 實作空菜單時的空狀態顯示於 `OrderLunchWeb/Views/Order/Menu.cshtml`
+- [ ] T055 實作無訂單紀錄時的空狀態顯示於 `OrderLunchWeb/Views/Order/History.cshtml`
 - [ ] T056 實作結帳逾時提示功能（30 分鐘）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T057 [P] 新增訂單相關 Serilog 日誌記錄於 `OrderLunchWeb/Services/OrderService.cs`
+- [ ] T057 新增訂單相關 Serilog 日誌記錄於 `OrderLunchWeb/Services/OrderService.cs`
 - [ ] T058 更新共用版面配置新增「訂單紀錄」導航連結於 `OrderLunchWeb/Views/Shared/_Layout.cshtml`
-- [ ] T059 驗證 quickstart.md 測試場景於 `specs/002-order-food/quickstart.md`
+- [ ] T059 實作訂單金額上限驗證（超過 100,000 元顯示提示）於 `OrderLunchWeb/wwwroot/js/order.js` 和 `OrderLunchWeb/Services/OrderService.cs`
+- [ ] T060 驗證 quickstart.md 測試場景於 `specs/002-order-food/quickstart.md`
 
 ---
 
@@ -229,29 +229,11 @@
 - 核心實作 → 整合
 - 故事完成後再進入下一個優先順序
 
-### Parallel Opportunities
+### Execution Order
 
-- 所有 Setup 階段標記 [P] 的任務可平行執行
-- 所有 Foundational 階段標記 [P] 的任務可平行執行
-- Foundational 完成後，所有 P1 使用者故事可平行開始
-- 同一故事內標記 [P] 的視圖任務可平行執行
-- 不同使用者故事可由不同團隊成員平行進行
-
----
-
-## Parallel Example: User Story 1
-
-```bash
-# Launch all tests for User Story 1 together:
-Task: T017 "建立 OrderService 單元測試"
-Task: T018 "建立 OrderController 整合測試"
-
-# Launch all views for User Story 1 together:
-Task: T025 "建立 SelectRestaurant.cshtml 視圖"
-Task: T026 "建立 Menu.cshtml 視圖"
-Task: T027 "建立 Checkout.cshtml 視圖"
-Task: T028 "建立 Confirmation.cshtml 視圖"
-```
+- 任務必須依序執行，按 T001 → T002 → ... → T060 順序進行
+- 每個 Phase 內的任務依序完成後，才進入下一個 Phase
+- 每個 User Story 依序完成後，才進入下一個優先順序
 
 ---
 
@@ -287,10 +269,9 @@ MVP = Phase 1-6 (User Stories 1-4)
 
 ## Notes
 
-- [P] 任務 = 不同檔案，無相依性
 - [Story] 標籤對應任務至特定使用者故事以便追蹤
 - 每個使用者故事應可獨立完成和測試
 - 實作前先驗證測試失敗
-- 每個任務或邏輯群組完成後提交
+- 每個任務完成後提交
 - 任何 checkpoint 都可停下來獨立驗證故事
-- 避免：模糊任務、同檔案衝突、破壞獨立性的跨故事相依
+- 任務必須依序執行，不支援平行處理
