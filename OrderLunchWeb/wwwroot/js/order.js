@@ -423,6 +423,9 @@ function updateOrderSummary() {
     
     // 更新總金額顯示
     totalSpan.textContent = formatCurrency(CartStorage.getTotalAmount());
+
+    // 驗證訂單金額上限
+    validateOrderAmount();
 }
 
 /**
@@ -1104,6 +1107,233 @@ function checkAndClearCartOnConfirmation() {
     }
 }
 
+// ============================================================================
+// 結帳逾時提示功能 (T056)
+// ============================================================================
+
+/**
+ * 結帳逾時常數
+ */
+const CheckoutTimeout = {
+    /** 結帳逾時時間（毫秒）- 30 分鐘 */
+    TIMEOUT_MS: 30 * 60 * 1000,
+    /** 結帳開始時間的 Session Storage 鍵名 */
+    STORAGE_KEY: 'checkoutStartTime',
+    /** 逾時警告顯示時間（毫秒）- 25 分鐘時顯示警告 */
+    WARNING_THRESHOLD_MS: 25 * 60 * 1000
+};
+
+/**
+ * 記錄結帳開始時間
+ * 當使用者進入結帳頁面時呼叫此函式
+ */
+function recordCheckoutStartTime() {
+    try {
+        const existingTime = sessionStorage.getItem(CheckoutTimeout.STORAGE_KEY);
+        if (!existingTime) {
+            const now = Date.now().toString();
+            sessionStorage.setItem(CheckoutTimeout.STORAGE_KEY, now);
+            console.log('結帳開始時間已記錄');
+        }
+    } catch (error) {
+        console.error('記錄結帳開始時間失敗:', error);
+    }
+}
+
+/**
+ * 清除結帳開始時間
+ * 當使用者完成訂單或離開結帳流程時呼叫
+ */
+function clearCheckoutStartTime() {
+    try {
+        sessionStorage.removeItem(CheckoutTimeout.STORAGE_KEY);
+    } catch (error) {
+        console.error('清除結帳開始時間失敗:', error);
+    }
+}
+
+/**
+ * 檢查結帳是否已逾時
+ * @returns {Object} 結果 { isTimeout: boolean, isWarning: boolean, remainingMinutes: number }
+ */
+function checkCheckoutTimeout() {
+    try {
+        const startTimeStr = sessionStorage.getItem(CheckoutTimeout.STORAGE_KEY);
+        if (!startTimeStr) {
+            return { isTimeout: false, isWarning: false, remainingMinutes: 30 };
+        }
+
+        const startTime = parseInt(startTimeStr, 10);
+        const elapsed = Date.now() - startTime;
+        const remainingMs = CheckoutTimeout.TIMEOUT_MS - elapsed;
+        const remainingMinutes = Math.max(0, Math.ceil(remainingMs / 60000));
+
+        return {
+            isTimeout: elapsed >= CheckoutTimeout.TIMEOUT_MS,
+            isWarning: elapsed >= CheckoutTimeout.WARNING_THRESHOLD_MS && elapsed < CheckoutTimeout.TIMEOUT_MS,
+            remainingMinutes: remainingMinutes
+        };
+    } catch (error) {
+        console.error('檢查結帳逾時失敗:', error);
+        return { isTimeout: false, isWarning: false, remainingMinutes: 30 };
+    }
+}
+
+/**
+ * 顯示結帳逾時提示
+ * @param {boolean} isTimeout 是否已逾時
+ * @param {number} remainingMinutes 剩餘分鐘數
+ */
+function showCheckoutTimeoutAlert(isTimeout, remainingMinutes) {
+    // 移除現有的逾時提示
+    const existingAlert = document.getElementById('checkout-timeout-alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.id = 'checkout-timeout-alert';
+    alertDiv.role = 'alert';
+
+    if (isTimeout) {
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <strong><i class="bi bi-exclamation-triangle"></i> 結帳逾時</strong>
+            <p class="mb-2">您的結帳時間已超過 30 分鐘，購物車內容可能已失效。</p>
+            <p class="mb-0">建議您返回菜單頁面重新選擇餐點。</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="關閉"></button>
+        `;
+    } else {
+        alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <strong><i class="bi bi-clock"></i> 結帳提醒</strong>
+            <p class="mb-0">您還有約 ${remainingMinutes} 分鐘完成結帳。超時後購物車內容可能失效。</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="關閉"></button>
+        `;
+    }
+
+    // 插入到表單前面
+    const container = document.querySelector('.container');
+    if (container) {
+        const firstChild = container.firstChild;
+        container.insertBefore(alertDiv, firstChild);
+    }
+}
+
+/**
+ * 初始化結帳逾時檢查
+ * 此函式應在結帳頁面載入後呼叫
+ */
+function initCheckoutTimeout() {
+    // 記錄結帳開始時間
+    recordCheckoutStartTime();
+
+    // 立即檢查一次
+    const initialStatus = checkCheckoutTimeout();
+    if (initialStatus.isTimeout) {
+        showCheckoutTimeoutAlert(true, 0);
+    } else if (initialStatus.isWarning) {
+        showCheckoutTimeoutAlert(false, initialStatus.remainingMinutes);
+    }
+
+    // 每分鐘檢查一次
+    setInterval(function() {
+        const status = checkCheckoutTimeout();
+        if (status.isTimeout || status.isWarning) {
+            showCheckoutTimeoutAlert(status.isTimeout, status.remainingMinutes);
+        }
+    }, 60000);
+}
+
+// ============================================================================
+// 訂單金額上限驗證功能 (T059)
+// ============================================================================
+
+/**
+ * 訂單金額上限常數
+ */
+const OrderAmountLimit = {
+    /** 訂單金額上限（新臺幣） */
+    MAX_AMOUNT: 100000
+};
+
+/**
+ * 檢查訂單金額是否超過上限
+ * @param {number} amount 訂單金額
+ * @returns {Object} 結果 { isExceeded: boolean, message: string }
+ */
+function checkOrderAmountLimit(amount) {
+    if (amount > OrderAmountLimit.MAX_AMOUNT) {
+        return {
+            isExceeded: true,
+            message: `訂單金額超過上限 NT$ ${OrderAmountLimit.MAX_AMOUNT.toLocaleString('zh-TW')}，請減少訂購數量`
+        };
+    }
+    return {
+        isExceeded: false,
+        message: ''
+    };
+}
+
+/**
+ * 顯示訂單金額上限警告
+ * @param {string} message 警告訊息
+ */
+function showAmountLimitWarning(message) {
+    // 移除現有的金額警告
+    const existingWarning = document.getElementById('amount-limit-warning');
+    if (existingWarning) {
+        existingWarning.remove();
+    }
+
+    const warningDiv = document.createElement('div');
+    warningDiv.id = 'amount-limit-warning';
+    warningDiv.className = 'alert alert-danger mt-2';
+    warningDiv.role = 'alert';
+    warningDiv.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${message}`;
+
+    // 插入到訂單摘要區塊
+    const orderTotal = document.getElementById('order-total');
+    if (orderTotal) {
+        orderTotal.parentElement.appendChild(warningDiv);
+    }
+
+    // 停用結帳按鈕
+    const checkoutBtn = document.getElementById('btn-checkout');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.remove('btn-success');
+        checkoutBtn.classList.add('btn-secondary');
+    }
+}
+
+/**
+ * 清除訂單金額上限警告
+ */
+function clearAmountLimitWarning() {
+    const existingWarning = document.getElementById('amount-limit-warning');
+    if (existingWarning) {
+        existingWarning.remove();
+    }
+}
+
+/**
+ * 驗證並顯示訂單金額狀態（整合到 updateOrderSummary）
+ * @returns {boolean} 是否通過金額驗證
+ */
+function validateOrderAmount() {
+    const totalAmount = CartStorage.getTotalAmount();
+    const result = checkOrderAmountLimit(totalAmount);
+
+    if (result.isExceeded) {
+        showAmountLimitWarning(result.message);
+        return false;
+    } else {
+        clearAmountLimitWarning();
+        return true;
+    }
+}
+
 /**
  * 頁面載入時的初始化邏輯
  */
@@ -1116,8 +1346,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初始化結帳表單驗證（如果在結帳頁面）
     if (document.getElementById('checkout-form')) {
         initCheckoutFormValidation();
+        initCheckoutTimeout();
     }
 
     // 檢查是否在確認頁面並清除購物車
     checkAndClearCartOnConfirmation();
+
+    // 訂單成功時清除結帳開始時間
+    const currentPath = window.location.pathname.toLowerCase();
+    if (currentPath.includes('/order/confirmation')) {
+        clearCheckoutStartTime();
+    }
 });

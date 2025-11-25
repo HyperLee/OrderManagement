@@ -188,14 +188,14 @@
 
 **Purpose**: 邊界情況處理和跨功能改善
 
-- [ ] T053 實作無餐廳資料時的空狀態顯示於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
-- [ ] T054 實作空菜單時的空狀態顯示於 `OrderLunchWeb/Views/Order/Menu.cshtml`
-- [ ] T055 實作無訂單紀錄時的空狀態顯示於 `OrderLunchWeb/Views/Order/History.cshtml`
-- [ ] T056 實作結帳逾時提示功能（30 分鐘）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T057 新增訂單相關 Serilog 日誌記錄於 `OrderLunchWeb/Services/OrderService.cs`
-- [ ] T058 更新共用版面配置新增「訂單紀錄」導航連結於 `OrderLunchWeb/Views/Shared/_Layout.cshtml`
-- [ ] T059 實作訂單金額上限驗證（超過 100,000 元顯示提示）於 `OrderLunchWeb/wwwroot/js/order.js` 和 `OrderLunchWeb/Services/OrderService.cs`
-- [ ] T060 驗證 quickstart.md 測試場景於 `specs/002-order-food/quickstart.md`
+- [x] T053 實作無餐廳資料時的空狀態顯示於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
+- [x] T054 實作空菜單時的空狀態顯示於 `OrderLunchWeb/Views/Order/Menu.cshtml`
+- [x] T055 實作無訂單紀錄時的空狀態顯示於 `OrderLunchWeb/Views/Order/History.cshtml`
+- [x] T056 實作結帳逾時提示功能（30 分鐘）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T057 新增訂單相關 Serilog 日誌記錄於 `OrderLunchWeb/Services/OrderService.cs`
+- [x] T058 更新共用版面配置新增「訂單紀錄」導航連結於 `OrderLunchWeb/Views/Shared/_Layout.cshtml`
+- [x] T059 實作訂單金額上限驗證（超過 100,000 元顯示提示）於 `OrderLunchWeb/wwwroot/js/order.js` 和 `OrderLunchWeb/Services/OrderService.cs`
+- [x] T060 驗證 quickstart.md 測試場景於 `specs/002-order-food/quickstart.md`
 
 ---
 
