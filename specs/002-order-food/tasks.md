@@ -38,17 +38,17 @@
 
 **⚠️ 重要**: 本階段完成前，任何使用者故事都無法開始
 
-- [ ] T006 實作 OrderStatus 列舉模型於 `OrderLunchWeb/Models/OrderStatus.cs`
-- [ ] T007 實作 OrderItem 模型（含快照欄位和驗證）於 `OrderLunchWeb/Models/OrderItem.cs`
-- [ ] T008 實作 Order 模型（含驗證屬性和計算屬性）於 `OrderLunchWeb/Models/Order.cs`
-- [ ] T009 實作 CheckoutViewModel 視圖模型於 `OrderLunchWeb/Models/CheckoutViewModel.cs`
-- [ ] T010 實作 OrderHistoryViewModel 視圖模型於 `OrderLunchWeb/Models/OrderHistoryViewModel.cs`
-- [ ] T011 實作 CartDto 和 CartItemDto 資料傳輸物件於 `OrderLunchWeb/Models/CartDto.cs`
-- [ ] T012 定義 IOrderService 介面（含所有方法簽名）於 `OrderLunchWeb/Services/IOrderService.cs`
-- [ ] T013 實作 OrderService 服務（訂單建立、查詢、清理邏輯）於 `OrderLunchWeb/Services/OrderService.cs`
-- [ ] T014 更新 Program.cs 註冊 IOrderService 和 OrderService 至 DI 容器於 `OrderLunchWeb/Program.cs`
-- [ ] T015 實作應用程式啟動時的舊訂單清理邏輯於 `OrderLunchWeb/Program.cs`
-- [ ] T016 實作前端購物車儲存基礎函式（CartStorage 物件）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T006 實作 OrderStatus 列舉模型於 `OrderLunchWeb/Models/OrderStatus.cs`
+- [x] T007 實作 OrderItem 模型（含快照欄位和驗證）於 `OrderLunchWeb/Models/OrderItem.cs`
+- [x] T008 實作 Order 模型（含驗證屬性和計算屬性）於 `OrderLunchWeb/Models/Order.cs`
+- [x] T009 實作 CheckoutViewModel 視圖模型於 `OrderLunchWeb/Models/CheckoutViewModel.cs`
+- [x] T010 實作 OrderHistoryViewModel 視圖模型於 `OrderLunchWeb/Models/OrderHistoryViewModel.cs`
+- [x] T011 實作 CartDto 和 CartItemDto 資料傳輸物件於 `OrderLunchWeb/Models/CartDto.cs`
+- [x] T012 定義 IOrderService 介面（含所有方法簽名）於 `OrderLunchWeb/Services/IOrderService.cs`
+- [x] T013 實作 OrderService 服務（訂單建立、查詢、清理邏輯）於 `OrderLunchWeb/Services/OrderService.cs`
+- [x] T014 更新 Program.cs 註冊 IOrderService 和 OrderService 至 DI 容器於 `OrderLunchWeb/Program.cs`
+- [x] T015 實作應用程式啟動時的舊訂單清理邏輯於 `OrderLunchWeb/Program.cs`
+- [x] T016 實作前端購物車儲存基礎函式（CartStorage 物件）於 `OrderLunchWeb/wwwroot/js/order.js`
 
 **Checkpoint**: 基礎設施完成 - 使用者故事實作可平行開始
 
