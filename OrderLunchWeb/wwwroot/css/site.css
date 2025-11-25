@@ -286,6 +286,59 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* ========================================
+   數量控制按鈕樣式 - 增強可見性
+   ======================================== */
+
+/* 數量增減按鈕樣式 */
+.btn-quantity-minus,
+.btn-quantity-plus {
+  min-width: 42px;
+  height: 42px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-quantity-minus:hover,
+.btn-quantity-plus:hover {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+.btn-quantity-minus:active,
+.btn-quantity-plus:active {
+  transform: scale(0.95);
+}
+
+/* 數量輸入框樣式 */
+.quantity-input {
+  height: 42px;
+  font-size: 1.1rem;
+  border-width: 2px;
+  border-left: none;
+  border-right: none;
+}
+
+.quantity-input:focus {
+  border-color: #0d6efd;
+  box-shadow: none;
+}
+
+/* 確保圖示在按鈕中清晰可見 */
+.btn-quantity-minus i,
+.btn-quantity-plus i {
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
 /* 列印樣式 */
 @media print {
   .btn,
