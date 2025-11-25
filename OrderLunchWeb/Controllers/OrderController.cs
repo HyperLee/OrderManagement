@@ -253,4 +253,76 @@ public class OrderController : Controller
             return RedirectToAction(nameof(SelectRestaurant));
         }
     }
+
+    /// <summary>
+    /// GET: /Order/History - 顯示訂單紀錄頁面（最近 5 天）
+    /// </summary>
+    /// <returns>訂單紀錄視圖</returns>
+    [HttpGet]
+    public async Task<IActionResult> History()
+    {
+        _logger.LogInformation("顯示訂單紀錄頁面");
+
+        try
+        {
+            var recentOrders = await _orderService.GetRecentOrdersAsync(5);
+
+            var viewModel = new OrderHistoryViewModel
+            {
+                Orders = recentOrders.Select(o => new OrderHistoryViewModel.OrderSummary
+                {
+                    OrderId = o.OrderId,
+                    CreatedAt = o.CreatedAt,
+                    StoreName = o.StoreName,
+                    TotalAmount = o.TotalAmount,
+                    Status = o.Status,
+                    ItemCount = o.Items.Count
+                }).ToList()
+            };
+
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "讀取訂單紀錄時發生錯誤");
+            TempData["ErrorMessage"] = "讀取訂單紀錄時發生錯誤，請稍後再試。";
+            return View(new OrderHistoryViewModel());
+        }
+    }
+
+    /// <summary>
+    /// GET: /Order/Details/{orderId} - 顯示訂單詳情頁面
+    /// </summary>
+    /// <param name="orderId">訂單編號</param>
+    /// <returns>訂單詳情視圖</returns>
+    [HttpGet("Order/Details/{orderId}")]
+    public async Task<IActionResult> Details(string orderId)
+    {
+        _logger.LogInformation("顯示訂單詳情頁面: OrderId={OrderId}", orderId);
+
+        if (string.IsNullOrWhiteSpace(orderId))
+        {
+            _logger.LogWarning("訂單編號為空");
+            return BadRequest();
+        }
+
+        try
+        {
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                _logger.LogWarning("找不到訂單: OrderId={OrderId}", orderId);
+                return NotFound();
+            }
+
+            return View(order);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "讀取訂單詳情時發生錯誤: OrderId={OrderId}", orderId);
+            TempData["ErrorMessage"] = "讀取訂單詳情時發生錯誤，請稍後再試。";
+            return RedirectToAction(nameof(History));
+        }
+    }
 }

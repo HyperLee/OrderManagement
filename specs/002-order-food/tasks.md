@@ -144,11 +144,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T044 [US5] 實作 History Action（訂單紀錄頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T045 [US5] 實作 Details Action（訂單詳情頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T046 [US5] 建立 History.cshtml 視圖（訂單紀錄清單）於 `OrderLunchWeb/Views/Order/History.cshtml`
-- [ ] T047 [US5] 建立 Details.cshtml 視圖（訂單詳情頁面）於 `OrderLunchWeb/Views/Order/Details.cshtml`
-- [ ] T048 [US5] 更新 Confirmation.cshtml 新增「查看訂單紀錄」連結於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
+- [x] T044 [US5] 實作 History Action（訂單紀錄頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T045 [US5] 實作 Details Action（訂單詳情頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T046 [US5] 建立 History.cshtml 視圖（訂單紀錄清單）於 `OrderLunchWeb/Views/Order/History.cshtml`
+- [x] T047 [US5] 建立 Details.cshtml 視圖（訂單詳情頁面）於 `OrderLunchWeb/Views/Order/Details.cshtml`
+- [x] T048 [US5] 更新 Confirmation.cshtml 新增「查看訂單紀錄」連結於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
 
 **Checkpoint**: User Story 5 完成後，使用者應可查看訂單歷史紀錄
 

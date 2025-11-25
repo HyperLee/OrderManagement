@@ -1,0 +1,118 @@
+@model OrderLunchWeb.Models.OrderHistoryViewModel
+@{
+    ViewData["Title"] = "訂單紀錄";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-clock-history"></i> 訂單紀錄</h1>
+        <a href="@Url.Action("SelectRestaurant", "Order")" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> 新增訂單
+        </a>
+    </div>
+
+    <p class="text-muted mb-4">顯示最近 5 天內的訂單紀錄</p>
+
+    @if (TempData["ErrorMessage"] is not null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Orders.Count == 0)
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="text-muted mb-3">
+                    <i class="bi bi-inbox display-1"></i>
+                </div>
+                <h4 class="text-muted">目前沒有訂單紀錄</h4>
+                <p class="text-muted mb-4">您在最近 5 天內沒有任何訂單。</p>
+                <a href="@Url.Action("SelectRestaurant", "Order")" class="btn btn-primary">
+                    <i class="bi bi-cart-plus"></i> 開始訂餐
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <strong><i class="bi bi-list-ul"></i> 共 @Model.Orders.Count 筆訂單</strong>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">訂單編號</th>
+                            <th scope="col">訂購時間</th>
+                            <th scope="col">餐廳</th>
+                            <th scope="col" class="text-center">項目數</th>
+                            <th scope="col" class="text-end">總金額</th>
+                            <th scope="col" class="text-center">狀態</th>
+                            <th scope="col" class="text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.Orders)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("Details", "Order", new { orderId = order.OrderId })" class="text-decoration-none">
+                                        <code>@order.OrderId</code>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span title="@order.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")">
+                                        @order.CreatedAt.ToString("MM/dd HH:mm")
+                                    </span>
+                                </td>
+                                <td>@order.StoreName</td>
+                                <td class="text-center">@order.ItemCount</td>
+                                <td class="text-end">
+                                    <strong class="text-success">NT$ @order.TotalAmount</strong>
+                                </td>
+                                <td class="text-center">
+                                    @switch (order.Status)
+                                    {
+                                        case OrderLunchWeb.Models.OrderStatus.Pending:
+                                            <span class="badge bg-warning text-dark">待確認</span>
+                                            break;
+                                        case OrderLunchWeb.Models.OrderStatus.Confirmed:
+                                            <span class="badge bg-info">已確認</span>
+                                            break;
+                                        case OrderLunchWeb.Models.OrderStatus.Preparing:
+                                            <span class="badge bg-primary">準備中</span>
+                                            break;
+                                        case OrderLunchWeb.Models.OrderStatus.Completed:
+                                            <span class="badge bg-success">已完成</span>
+                                            break;
+                                        case OrderLunchWeb.Models.OrderStatus.Cancelled:
+                                            <span class="badge bg-danger">已取消</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-light text-dark">未知</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("Details", "Order", new { orderId = order.OrderId })" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> 查看詳情
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+            <i class="bi bi-house"></i> 返回首頁
+        </a>
+    </div>
+</div>
