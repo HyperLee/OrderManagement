@@ -129,7 +129,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const storeId = '@Model.Id';
-            const storeName = '@Model.Name';
+            const storeName = @Html.Raw(Json.Serialize(Model.Name));
             
             // 初始化購物車
             CartStorage.initCart(storeId, storeName);
