@@ -39,6 +39,7 @@ public class JsonFileStorageTests : IDisposable
     {
         // Arrange & Act
         // (已在建構函式中執行)
+        await Task.CompletedTask;
 
         // Assert
         Assert.True(Directory.Exists(_testDataDirectory), "資料目錄應該被建立");
