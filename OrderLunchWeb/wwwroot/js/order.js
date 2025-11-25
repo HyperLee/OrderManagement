@@ -287,10 +287,8 @@ function addToOrder(menuItemId, name, price, quantity) {
     const result = CartStorage.addItem(item);
     
     if (result) {
-        // 更新 UI（如果有 updateOrderSummaryUI 函式）
-        if (typeof updateOrderSummaryUI === 'function') {
-            updateOrderSummaryUI();
-        }
+        // 更新訂單摘要 UI
+        updateOrderSummary();
         
         // 顯示成功訊息（可選）
         console.log('已加入訂單:', name, 'x', quantity);
@@ -310,4 +308,180 @@ function goToCheckout() {
     const checkoutUrl = '/Order/Checkout?cartData=' + encodeURIComponent(cartJson);
     
     window.location.href = checkoutUrl;
+}
+
+/**
+ * HTML 轉義函式
+ * @param {string} text 要轉義的文字
+ * @returns {string} 轉義後的文字
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * 更新訂單摘要 UI
+ * 根據購物車內容即時更新訂單摘要區塊的顯示
+ */
+function updateOrderSummary() {
+    const cart = CartStorage.getCart();
+    const emptyDiv = document.getElementById('order-summary-empty');
+    const itemsDiv = document.getElementById('order-summary-items');
+    const itemsList = document.getElementById('order-items-list');
+    const totalSpan = document.getElementById('order-total');
+    const checkoutBtn = document.getElementById('btn-checkout');
+    const itemCountSpan = document.getElementById('order-item-count');
+    
+    // 檢查必要的 DOM 元素是否存在
+    if (!emptyDiv || !itemsDiv || !itemsList || !totalSpan || !checkoutBtn) {
+        return;
+    }
+    
+    // 更新項目數量顯示
+    const totalItemCount = CartStorage.getItemCount();
+    if (itemCountSpan) {
+        itemCountSpan.textContent = totalItemCount + ' 項';
+    }
+    
+    if (cart.items.length === 0) {
+        // 購物車為空時顯示空狀態
+        emptyDiv.classList.remove('d-none');
+        itemsDiv.classList.add('d-none');
+        totalSpan.textContent = formatCurrency(0);
+        updateCheckoutButtonState(false);
+        return;
+    }
+    
+    // 購物車有項目時顯示項目列表
+    emptyDiv.classList.add('d-none');
+    itemsDiv.classList.remove('d-none');
+    updateCheckoutButtonState(true);
+    
+    // 建立項目列表 HTML
+    itemsList.innerHTML = '';
+    cart.items.forEach(function(item) {
+        const subtotal = Math.round(item.price * item.quantity * 100) / 100;
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="fw-bold">${escapeHtml(item.name)}</div>
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" 
+                        data-menu-item-id="${item.menuItemId}"
+                        title="移除此項目">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-summary-minus" 
+                            data-menu-item-id="${item.menuItemId}"
+                            title="減少數量">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                    <span class="badge bg-light text-dark mx-1" style="min-width: 30px;">${item.quantity}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-summary-plus" 
+                            data-menu-item-id="${item.menuItemId}"
+                            title="增加數量">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted d-block">${formatCurrency(item.price)} × ${item.quantity}</small>
+                    <span class="badge bg-primary">${formatCurrency(subtotal)}</span>
+                </div>
+            </div>
+        `;
+        itemsList.appendChild(li);
+    });
+    
+    // 綁定刪除按鈕事件
+    bindRemoveItemButtons();
+    
+    // 綁定訂單摘要中的數量調整按鈕
+    bindSummaryQuantityButtons();
+    
+    // 更新總金額顯示
+    totalSpan.textContent = formatCurrency(CartStorage.getTotalAmount());
+}
+
+/**
+ * 綁定移除項目按鈕的事件處理
+ */
+function bindRemoveItemButtons() {
+    document.querySelectorAll('.btn-remove-item').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const menuItemId = this.dataset.menuItemId;
+            CartStorage.removeItem(menuItemId);
+            updateOrderSummary();
+        });
+    });
+}
+
+/**
+ * 更新「前往結帳」按鈕狀態
+ * @param {boolean} enabled 是否啟用按鈕
+ */
+function updateCheckoutButtonState(enabled) {
+    const checkoutBtn = document.getElementById('btn-checkout');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = !enabled;
+        
+        // 更新按鈕樣式以提供視覺回饋
+        if (enabled) {
+            checkoutBtn.classList.remove('btn-secondary');
+            checkoutBtn.classList.add('btn-success');
+        } else {
+            checkoutBtn.classList.remove('btn-success');
+            checkoutBtn.classList.add('btn-secondary');
+        }
+    }
+}
+
+/**
+ * 綁定訂單摘要中數量調整按鈕的事件處理
+ */
+function bindSummaryQuantityButtons() {
+    // 綁定減少數量按鈕
+    document.querySelectorAll('.btn-summary-minus').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const menuItemId = this.dataset.menuItemId;
+            const cart = CartStorage.getCart();
+            const item = cart.items.find(i => i.menuItemId === menuItemId);
+            
+            if (item) {
+                if (item.quantity <= 1) {
+                    // 數量為 1 時，移除項目
+                    CartStorage.removeItem(menuItemId);
+                } else {
+                    // 減少數量
+                    CartStorage.updateQuantity(menuItemId, item.quantity - 1);
+                }
+                updateOrderSummary();
+            }
+        });
+    });
+    
+    // 綁定增加數量按鈕
+    document.querySelectorAll('.btn-summary-plus').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const menuItemId = this.dataset.menuItemId;
+            const cart = CartStorage.getCart();
+            const item = cart.items.find(i => i.menuItemId === menuItemId);
+            
+            if (item && item.quantity < 100) {
+                CartStorage.updateQuantity(menuItemId, item.quantity + 1);
+                updateOrderSummary();
+            }
+        });
+    });
+}
+
+/**
+ * 為了向後相容，保留 updateOrderSummaryUI 別名
+ */
+function updateOrderSummaryUI() {
+    updateOrderSummary();
 }

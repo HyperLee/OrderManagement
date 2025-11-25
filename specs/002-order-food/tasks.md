@@ -93,10 +93,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] 實作前端訂單摘要 UI 更新函式（updateOrderSummary）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T033 [US2] 實作前端訂單總金額格式化顯示（NT$ 格式）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T034 [US2] 實作前端「前往結帳」按鈕狀態管理（啟用/停用）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T035 [US2] 更新 Menu.cshtml 訂單摘要區塊樣式和互動於 `OrderLunchWeb/Views/Order/Menu.cshtml`
+- [x] T032 [US2] 實作前端訂單摘要 UI 更新函式（updateOrderSummary）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T033 [US2] 實作前端訂單總金額格式化顯示（NT$ 格式）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T034 [US2] 實作前端「前往結帳」按鈕狀態管理（啟用/停用）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T035 [US2] 更新 Menu.cshtml 訂單摘要區塊樣式和互動於 `OrderLunchWeb/Views/Order/Menu.cshtml`
 
 **Checkpoint**: User Story 2 完成後，訂單摘要應即時反映購物車狀態
 
