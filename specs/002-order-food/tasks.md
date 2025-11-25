@@ -24,11 +24,11 @@
 
 **Purpose**: 專案初始化和基本結構設定
 
-- [ ] T001 建立訂單相關模型檔案結構：建立 `OrderLunchWeb/Models/Order.cs`, `OrderLunchWeb/Models/OrderItem.cs`, `OrderLunchWeb/Models/OrderStatus.cs`
-- [ ] T002 建立訂單服務介面和實作檔案結構：建立 `OrderLunchWeb/Services/IOrderService.cs`, `OrderLunchWeb/Services/OrderService.cs`
-- [ ] T003 建立訂單視圖資料夾結構：建立 `OrderLunchWeb/Views/Order/` 資料夾
-- [ ] T004 建立訂單資料儲存檔案：建立 `OrderLunchWeb/Data/orders.json`（空陣列初始內容）
-- [ ] T005 建立前端 JavaScript 檔案：建立 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T001 建立訂單相關模型檔案結構：建立 `OrderLunchWeb/Models/Order.cs`, `OrderLunchWeb/Models/OrderItem.cs`, `OrderLunchWeb/Models/OrderStatus.cs`
+- [x] T002 建立訂單服務介面和實作檔案結構：建立 `OrderLunchWeb/Services/IOrderService.cs`, `OrderLunchWeb/Services/OrderService.cs`
+- [x] T003 建立訂單視圖資料夾結構：建立 `OrderLunchWeb/Views/Order/` 資料夾
+- [x] T004 建立訂單資料儲存檔案：建立 `OrderLunchWeb/Data/orders.json`（空陣列初始內容）
+- [x] T005 建立前端 JavaScript 檔案：建立 `OrderLunchWeb/wwwroot/js/order.js`
 
 ---
 
