@@ -110,10 +110,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T036 [US3] 實作前端數量增減按鈕邏輯（+/- 按鈕）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T037 [US3] 實作前端數量輸入驗證（正整數檢查、範圍 1-100 限制）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T038 [US3] 實作前端無效數量自動修正邏輯於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T039 [US3] 更新 Menu.cshtml 數量選擇器 UI 元件於 `OrderLunchWeb/Views/Order/Menu.cshtml`
+- [x] T036 [US3] 實作前端數量增減按鈕邏輯（+/- 按鈕）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T037 [US3] 實作前端數量輸入驗證（正整數檢查、範圍 1-100 限制）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T038 [US3] 實作前端無效數量自動修正邏輯於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T039 [US3] 更新 Menu.cshtml 數量選擇器 UI 元件於 `OrderLunchWeb/Views/Order/Menu.cshtml`
 
 **Checkpoint**: User Story 3 完成後，數量調整功能應完整且防呆
 

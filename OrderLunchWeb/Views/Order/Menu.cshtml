@@ -137,50 +137,23 @@
             // 更新訂單摘要顯示
             updateOrderSummary();
             
+            // 初始化數量控制功能（使用 order.js 提供的函式）
+            initQuantityControls();
+            
             // 綁定「加入訂單」按鈕事件
             document.querySelectorAll('.btn-add-to-cart').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const menuItemId = this.dataset.menuItemId;
                     const menuItemName = this.dataset.menuItemName;
                     const menuItemPrice = parseFloat(this.dataset.menuItemPrice);
-                    const quantityInput = document.getElementById('quantity-' + menuItemId);
-                    const quantity = parseInt(quantityInput.value, 10) || 1;
+                    
+                    // 使用驗證後的數量值
+                    const quantity = getQuantity(menuItemId);
                     
                     addToOrder(menuItemId, menuItemName, menuItemPrice, quantity);
                     
                     // 重設數量為 1
-                    quantityInput.value = 1;
-                });
-            });
-            
-            // 綁定數量 +/- 按鈕事件
-            document.querySelectorAll('.btn-quantity-minus').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const menuItemId = this.dataset.menuItemId;
-                    const input = document.getElementById('quantity-' + menuItemId);
-                    const currentValue = parseInt(input.value, 10) || 1;
-                    input.value = Math.max(1, currentValue - 1);
-                });
-            });
-            
-            document.querySelectorAll('.btn-quantity-plus').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const menuItemId = this.dataset.menuItemId;
-                    const input = document.getElementById('quantity-' + menuItemId);
-                    const currentValue = parseInt(input.value, 10) || 1;
-                    input.value = Math.min(100, currentValue + 1);
-                });
-            });
-            
-            // 綁定數量輸入驗證
-            document.querySelectorAll('.quantity-input').forEach(function(input) {
-                input.addEventListener('change', function() {
-                    let value = parseInt(this.value, 10);
-                    if (isNaN(value) || value < 1) {
-                        this.value = 1;
-                    } else if (value > 100) {
-                        this.value = 100;
-                    }
+                    setQuantity(menuItemId, 1);
                 });
             });
             

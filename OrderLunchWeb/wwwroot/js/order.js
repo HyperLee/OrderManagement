@@ -485,3 +485,321 @@ function bindSummaryQuantityButtons() {
 function updateOrderSummaryUI() {
     updateOrderSummary();
 }
+
+// ============================================================================
+// 數量選擇與驗證功能 (User Story 3)
+// ============================================================================
+
+/**
+ * 數量輸入驗證常數
+ */
+const QuantityValidation = {
+    MIN_VALUE: 1,
+    MAX_VALUE: 100,
+    DEFAULT_VALUE: 1
+};
+
+/**
+ * 驗證並修正數量值
+ * @param {number|string} value 輸入的數量值
+ * @returns {Object} 驗證結果 { isValid: boolean, value: number, message: string }
+ */
+function validateQuantity(value) {
+    // 處理空值
+    if (value === null || value === undefined || value === '') {
+        return {
+            isValid: false,
+            value: QuantityValidation.DEFAULT_VALUE,
+            message: '數量不能為空，已自動設為 1'
+        };
+    }
+
+    // 轉換為數字
+    const numValue = Number(value);
+
+    // 檢查是否為有效數字
+    if (isNaN(numValue)) {
+        return {
+            isValid: false,
+            value: QuantityValidation.DEFAULT_VALUE,
+            message: '數量必須為數字，已自動設為 1'
+        };
+    }
+
+    // 檢查是否為正整數
+    if (!Number.isInteger(numValue)) {
+        const correctedValue = Math.round(numValue);
+        const finalValue = Math.min(Math.max(correctedValue, QuantityValidation.MIN_VALUE), QuantityValidation.MAX_VALUE);
+        return {
+            isValid: false,
+            value: finalValue,
+            message: `數量必須為整數，已自動修正為 ${finalValue}`
+        };
+    }
+
+    // 檢查是否小於最小值
+    if (numValue < QuantityValidation.MIN_VALUE) {
+        return {
+            isValid: false,
+            value: QuantityValidation.MIN_VALUE,
+            message: `數量不能小於 ${QuantityValidation.MIN_VALUE}，已自動修正`
+        };
+    }
+
+    // 檢查是否大於最大值
+    if (numValue > QuantityValidation.MAX_VALUE) {
+        return {
+            isValid: false,
+            value: QuantityValidation.MAX_VALUE,
+            message: `數量不能超過 ${QuantityValidation.MAX_VALUE}，已自動修正`
+        };
+    }
+
+    // 驗證通過
+    return {
+        isValid: true,
+        value: numValue,
+        message: ''
+    };
+}
+
+/**
+ * 自動修正無效數量並更新輸入框
+ * @param {HTMLInputElement} input 數量輸入框元素
+ * @returns {number} 修正後的數量值
+ */
+function autoCorrectQuantity(input) {
+    if (!input) {
+        console.error('數量輸入框元素不存在');
+        return QuantityValidation.DEFAULT_VALUE;
+    }
+
+    const result = validateQuantity(input.value);
+    
+    // 更新輸入框的值
+    input.value = result.value;
+
+    // 如果無效，顯示提示訊息
+    if (!result.isValid && result.message) {
+        // 更新輸入框狀態
+        showQuantityFeedback(input, result.message, false);
+    } else {
+        // 清除錯誤狀態
+        clearQuantityFeedback(input);
+    }
+
+    return result.value;
+}
+
+/**
+ * 顯示數量驗證回饋訊息
+ * @param {HTMLInputElement} input 數量輸入框元素
+ * @param {string} message 回饋訊息
+ * @param {boolean} isSuccess 是否為成功訊息
+ */
+function showQuantityFeedback(input, message, isSuccess) {
+    if (!input) return;
+
+    // 移除之前的樣式
+    input.classList.remove('is-valid', 'is-invalid');
+    
+    // 添加新的樣式
+    input.classList.add(isSuccess ? 'is-valid' : 'is-invalid');
+
+    // 取得或建立回饋元素
+    let feedbackDiv = input.parentElement.querySelector('.quantity-feedback');
+    if (!feedbackDiv) {
+        feedbackDiv = document.createElement('div');
+        feedbackDiv.className = 'quantity-feedback invalid-feedback';
+        feedbackDiv.style.cssText = 'position: absolute; font-size: 0.75rem; white-space: nowrap;';
+        input.parentElement.style.position = 'relative';
+        input.parentElement.appendChild(feedbackDiv);
+    }
+
+    feedbackDiv.textContent = message;
+    feedbackDiv.classList.remove('valid-feedback', 'invalid-feedback');
+    feedbackDiv.classList.add(isSuccess ? 'valid-feedback' : 'invalid-feedback');
+    feedbackDiv.style.display = 'block';
+
+    // 3 秒後自動清除回饋
+    setTimeout(function() {
+        clearQuantityFeedback(input);
+    }, 3000);
+}
+
+/**
+ * 清除數量驗證回饋
+ * @param {HTMLInputElement} input 數量輸入框元素
+ */
+function clearQuantityFeedback(input) {
+    if (!input) return;
+
+    input.classList.remove('is-valid', 'is-invalid');
+    
+    const feedbackDiv = input.parentElement.querySelector('.quantity-feedback');
+    if (feedbackDiv) {
+        feedbackDiv.style.display = 'none';
+    }
+}
+
+/**
+ * 減少數量
+ * @param {string} menuItemId 菜品 ID
+ * @returns {number} 更新後的數量
+ */
+function decreaseQuantity(menuItemId) {
+    const input = document.getElementById('quantity-' + menuItemId);
+    if (!input) {
+        console.error('找不到數量輸入框: quantity-' + menuItemId);
+        return QuantityValidation.DEFAULT_VALUE;
+    }
+
+    // 先驗證並修正當前值
+    const currentValue = autoCorrectQuantity(input);
+    
+    // 計算新值
+    const newValue = Math.max(QuantityValidation.MIN_VALUE, currentValue - 1);
+    input.value = newValue;
+
+    // 觸發 change 事件以便其他監聽器可以處理
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    return newValue;
+}
+
+/**
+ * 增加數量
+ * @param {string} menuItemId 菜品 ID
+ * @returns {number} 更新後的數量
+ */
+function increaseQuantity(menuItemId) {
+    const input = document.getElementById('quantity-' + menuItemId);
+    if (!input) {
+        console.error('找不到數量輸入框: quantity-' + menuItemId);
+        return QuantityValidation.DEFAULT_VALUE;
+    }
+
+    // 先驗證並修正當前值
+    const currentValue = autoCorrectQuantity(input);
+    
+    // 計算新值
+    const newValue = Math.min(QuantityValidation.MAX_VALUE, currentValue + 1);
+    input.value = newValue;
+
+    // 如果已達上限，顯示提示
+    if (newValue === QuantityValidation.MAX_VALUE && currentValue === QuantityValidation.MAX_VALUE) {
+        showQuantityFeedback(input, `數量已達上限 ${QuantityValidation.MAX_VALUE}`, false);
+    }
+
+    // 觸發 change 事件以便其他監聯器可以處理
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    return newValue;
+}
+
+/**
+ * 直接設定數量
+ * @param {string} menuItemId 菜品 ID
+ * @param {number|string} quantity 數量值
+ * @returns {number} 驗證並修正後的數量
+ */
+function setQuantity(menuItemId, quantity) {
+    const input = document.getElementById('quantity-' + menuItemId);
+    if (!input) {
+        console.error('找不到數量輸入框: quantity-' + menuItemId);
+        return QuantityValidation.DEFAULT_VALUE;
+    }
+
+    input.value = quantity;
+    return autoCorrectQuantity(input);
+}
+
+/**
+ * 取得當前數量值
+ * @param {string} menuItemId 菜品 ID
+ * @returns {number} 當前數量值（已驗證）
+ */
+function getQuantity(menuItemId) {
+    const input = document.getElementById('quantity-' + menuItemId);
+    if (!input) {
+        console.error('找不到數量輸入框: quantity-' + menuItemId);
+        return QuantityValidation.DEFAULT_VALUE;
+    }
+
+    const result = validateQuantity(input.value);
+    return result.value;
+}
+
+/**
+ * 綁定數量輸入框的驗證事件
+ * @param {HTMLInputElement} input 數量輸入框元素
+ */
+function bindQuantityInputValidation(input) {
+    if (!input) return;
+
+    // 輸入時即時驗證（只允許數字）
+    input.addEventListener('input', function(e) {
+        // 移除非數字字元
+        const originalValue = this.value;
+        const sanitizedValue = originalValue.replace(/[^0-9]/g, '');
+        
+        if (originalValue !== sanitizedValue) {
+            this.value = sanitizedValue;
+        }
+    });
+
+    // 失去焦點時進行完整驗證和修正
+    input.addEventListener('blur', function(e) {
+        autoCorrectQuantity(this);
+    });
+
+    // 變更時驗證
+    input.addEventListener('change', function(e) {
+        autoCorrectQuantity(this);
+    });
+
+    // 按下 Enter 鍵時驗證
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            autoCorrectQuantity(this);
+            this.blur();
+        }
+    });
+
+    // 防止透過滾輪修改（避免意外修改）
+    input.addEventListener('wheel', function(e) {
+        if (document.activeElement === this) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+}
+
+/**
+ * 綁定菜單頁面的數量控制按鈕
+ * 此函式應在 DOMContentLoaded 後呼叫
+ */
+function initQuantityControls() {
+    // 綁定減少數量按鈕
+    document.querySelectorAll('.btn-quantity-minus').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const menuItemId = this.dataset.menuItemId;
+            decreaseQuantity(menuItemId);
+        });
+    });
+
+    // 綁定增加數量按鈕
+    document.querySelectorAll('.btn-quantity-plus').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const menuItemId = this.dataset.menuItemId;
+            increaseQuantity(menuItemId);
+        });
+    });
+
+    // 綁定所有數量輸入框的驗證
+    document.querySelectorAll('.quantity-input').forEach(function(input) {
+        bindQuantityInputValidation(input);
+    });
+}
