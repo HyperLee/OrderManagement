@@ -114,11 +114,12 @@
             </div>
 
             <div class="mt-3">
-                <a href="@Url.Action("Menu", "Order", new { storeId = Model.StoreId })" 
-                   class="btn btn-outline-secondary"
-                   id="btn-back-to-menu">
+                <button type="button" 
+                        class="btn btn-outline-secondary"
+                        id="btn-back-to-menu"
+                        data-store-id="@Model.StoreId">
                     <i class="bi bi-arrow-left"></i> 返回修改訂單
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -127,4 +128,16 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/order.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 綁定「返回修改訂單」按鈕事件
+            const backToMenuBtn = document.getElementById('btn-back-to-menu');
+            if (backToMenuBtn) {
+                backToMenuBtn.addEventListener('click', function() {
+                    const storeId = this.dataset.storeId;
+                    goBackToMenu(storeId);
+                });
+            }
+        });
+    </script>
 }

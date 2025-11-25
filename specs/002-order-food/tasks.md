@@ -177,8 +177,8 @@
 
 ### Implementation for User Story 7
 
-- [ ] T051 [US7] 更新 Checkout.cshtml 新增「返回修改」按鈕於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
-- [ ] T052 [US7] 實作前端「返回修改」導航邏輯（保留購物車）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T051 [US7] 更新 Checkout.cshtml 新增「返回修改」按鈕於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
+- [x] T052 [US7] 實作前端「返回修改」導航邏輯（保留購物車）於 `OrderLunchWeb/wwwroot/js/order.js`
 
 **Checkpoint**: User Story 7 完成後，使用者應可從結帳頁面返回修改訂單
 

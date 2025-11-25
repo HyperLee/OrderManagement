@@ -311,6 +311,24 @@ function goToCheckout() {
 }
 
 /**
+ * 返回菜單頁面修改訂單
+ * 此函式會保留購物車內容，導航回指定餐廳的菜單頁面
+ * @param {string} storeId 餐廳 ID
+ */
+function goBackToMenu(storeId) {
+    if (!storeId) {
+        console.error('餐廳 ID 未提供');
+        return;
+    }
+
+    // 購物車資料保留在 Session Storage 中，不需要額外處理
+    // Menu 頁面載入時會透過 CartStorage.initCart() 恢復購物車內容
+    const menuUrl = '/Order/Menu?storeId=' + encodeURIComponent(storeId);
+    
+    window.location.href = menuUrl;
+}
+
+/**
  * HTML 轉義函式
  * @param {string} text 要轉義的文字
  * @returns {string} 轉義後的文字
