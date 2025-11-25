@@ -803,3 +803,303 @@ function initQuantityControls() {
         bindQuantityInputValidation(input);
     });
 }
+
+// ============================================================================
+// 結帳表單驗證功能 (User Story 4)
+// ============================================================================
+
+/**
+ * 表單驗證規則常數
+ */
+const CheckoutValidation = {
+    /** 姓名最小長度 */
+    NAME_MIN_LENGTH: 1,
+    /** 姓名最大長度 */
+    NAME_MAX_LENGTH: 50,
+    /** 電話最小長度 */
+    PHONE_MIN_LENGTH: 8,
+    /** 電話最大長度 */
+    PHONE_MAX_LENGTH: 15
+};
+
+/**
+ * 驗證電話號碼格式
+ * @param {string} phone 電話號碼
+ * @returns {Object} 驗證結果 { isValid: boolean, message: string }
+ */
+function validatePhoneNumber(phone) {
+    // 檢查空值
+    if (!phone || phone.trim() === '') {
+        return {
+            isValid: false,
+            message: '聯絡電話為必填欄位'
+        };
+    }
+
+    const trimmedPhone = phone.trim();
+
+    // 檢查是否僅包含數字
+    if (!/^\d+$/.test(trimmedPhone)) {
+        return {
+            isValid: false,
+            message: '電話號碼僅能輸入數字'
+        };
+    }
+
+    // 檢查長度是否在有效範圍內
+    if (trimmedPhone.length < CheckoutValidation.PHONE_MIN_LENGTH) {
+        return {
+            isValid: false,
+            message: `電話號碼長度至少需要 ${CheckoutValidation.PHONE_MIN_LENGTH} 碼`
+        };
+    }
+
+    if (trimmedPhone.length > CheckoutValidation.PHONE_MAX_LENGTH) {
+        return {
+            isValid: false,
+            message: `電話號碼長度不能超過 ${CheckoutValidation.PHONE_MAX_LENGTH} 碼`
+        };
+    }
+
+    return {
+        isValid: true,
+        message: ''
+    };
+}
+
+/**
+ * 驗證客戶姓名
+ * @param {string} name 客戶姓名
+ * @returns {Object} 驗證結果 { isValid: boolean, message: string }
+ */
+function validateCustomerName(name) {
+    // 檢查空值
+    if (!name || name.trim() === '') {
+        return {
+            isValid: false,
+            message: '姓名為必填欄位'
+        };
+    }
+
+    const trimmedName = name.trim();
+
+    // 檢查長度是否超過限制
+    if (trimmedName.length > CheckoutValidation.NAME_MAX_LENGTH) {
+        return {
+            isValid: false,
+            message: `姓名長度不能超過 ${CheckoutValidation.NAME_MAX_LENGTH} 個字元`
+        };
+    }
+
+    return {
+        isValid: true,
+        message: ''
+    };
+}
+
+/**
+ * 驗證結帳表單
+ * @returns {Object} 驗證結果 { isValid: boolean, errors: { name: string, phone: string } }
+ */
+function validateCheckoutForm() {
+    const nameInput = document.querySelector('input[name="CustomerName"]');
+    const phoneInput = document.querySelector('input[name="CustomerPhone"]');
+    
+    const errors = {
+        name: '',
+        phone: ''
+    };
+
+    let isValid = true;
+
+    // 驗證姓名
+    if (nameInput) {
+        const nameResult = validateCustomerName(nameInput.value);
+        if (!nameResult.isValid) {
+            isValid = false;
+            errors.name = nameResult.message;
+            setFieldValidationState(nameInput, false, nameResult.message);
+        } else {
+            setFieldValidationState(nameInput, true);
+        }
+    }
+
+    // 驗證電話
+    if (phoneInput) {
+        const phoneResult = validatePhoneNumber(phoneInput.value);
+        if (!phoneResult.isValid) {
+            isValid = false;
+            errors.phone = phoneResult.message;
+            setFieldValidationState(phoneInput, false, phoneResult.message);
+        } else {
+            setFieldValidationState(phoneInput, true);
+        }
+    }
+
+    return {
+        isValid: isValid,
+        errors: errors
+    };
+}
+
+/**
+ * 設定表單欄位的驗證狀態
+ * @param {HTMLInputElement} input 輸入欄位
+ * @param {boolean} isValid 是否有效
+ * @param {string} message 錯誤訊息（可選）
+ */
+function setFieldValidationState(input, isValid, message) {
+    if (!input) return;
+
+    // 移除之前的驗證樣式
+    input.classList.remove('is-valid', 'is-invalid');
+
+    // 添加新的驗證樣式
+    input.classList.add(isValid ? 'is-valid' : 'is-invalid');
+
+    // 取得或建立回饋訊息元素
+    const feedbackSelector = 'span[data-valmsg-for="' + input.name + '"]';
+    let feedbackSpan = document.querySelector(feedbackSelector);
+    
+    // 如果找不到 asp-validation-for 產生的 span，嘗試找 .invalid-feedback 或建立一個
+    if (!feedbackSpan) {
+        feedbackSpan = input.parentElement.querySelector('.field-validation-error, .field-validation-valid, .invalid-feedback');
+    }
+    
+    if (!feedbackSpan) {
+        feedbackSpan = document.createElement('span');
+        feedbackSpan.className = 'invalid-feedback';
+        feedbackSpan.setAttribute('data-valmsg-for', input.name);
+        input.parentElement.appendChild(feedbackSpan);
+    }
+
+    // 更新回饋訊息
+    if (!isValid && message) {
+        feedbackSpan.textContent = message;
+        feedbackSpan.className = 'text-danger invalid-feedback d-block';
+    } else if (isValid) {
+        feedbackSpan.textContent = '';
+        feedbackSpan.className = 'valid-feedback';
+    }
+}
+
+/**
+ * 清除表單欄位的驗證狀態
+ * @param {HTMLInputElement} input 輸入欄位
+ */
+function clearFieldValidationState(input) {
+    if (!input) return;
+
+    input.classList.remove('is-valid', 'is-invalid');
+
+    const feedbackSelector = 'span[data-valmsg-for="' + input.name + '"]';
+    const feedbackSpan = document.querySelector(feedbackSelector);
+    
+    if (feedbackSpan) {
+        feedbackSpan.textContent = '';
+        feedbackSpan.className = '';
+    }
+}
+
+/**
+ * 初始化結帳表單驗證
+ * 此函式應在結帳頁面載入後呼叫
+ */
+function initCheckoutFormValidation() {
+    const form = document.getElementById('checkout-form');
+    const nameInput = document.querySelector('input[name="CustomerName"]');
+    const phoneInput = document.querySelector('input[name="CustomerPhone"]');
+
+    if (!form) return;
+
+    // 電話輸入即時過濾非數字
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            // 移除非數字字元
+            const originalValue = this.value;
+            const sanitizedValue = originalValue.replace(/[^0-9]/g, '');
+            
+            if (originalValue !== sanitizedValue) {
+                this.value = sanitizedValue;
+            }
+        });
+
+        // 失去焦點時驗證
+        phoneInput.addEventListener('blur', function() {
+            const result = validatePhoneNumber(this.value);
+            setFieldValidationState(this, result.isValid, result.message);
+        });
+    }
+
+    // 姓名失去焦點時驗證
+    if (nameInput) {
+        nameInput.addEventListener('blur', function() {
+            const result = validateCustomerName(this.value);
+            setFieldValidationState(this, result.isValid, result.message);
+        });
+    }
+
+    // 表單提交時驗證
+    form.addEventListener('submit', function(e) {
+        const validationResult = validateCheckoutForm();
+        
+        if (!validationResult.isValid) {
+            e.preventDefault();
+            
+            // 聚焦到第一個錯誤欄位
+            if (validationResult.errors.name && nameInput) {
+                nameInput.focus();
+            } else if (validationResult.errors.phone && phoneInput) {
+                phoneInput.focus();
+            }
+            
+            return false;
+        }
+        
+        return true;
+    });
+}
+
+/**
+ * 訂單成功後清除 Session Storage
+ * 應在訂單確認頁面呼叫此函式
+ */
+function clearCartAfterOrderSuccess() {
+    try {
+        CartStorage.clearCart();
+        console.log('訂單成功，購物車已清除');
+        return true;
+    } catch (error) {
+        console.error('清除購物車時發生錯誤:', error);
+        return false;
+    }
+}
+
+/**
+ * 檢查是否在訂單確認頁面並自動清除購物車
+ * 此函式會檢查 URL 是否包含 Confirmation 路徑
+ */
+function checkAndClearCartOnConfirmation() {
+    const currentPath = window.location.pathname.toLowerCase();
+    if (currentPath.includes('/order/confirmation')) {
+        clearCartAfterOrderSuccess();
+    }
+}
+
+/**
+ * 頁面載入時的初始化邏輯
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化數量控制（如果在菜單頁面）
+    if (document.querySelector('.quantity-input')) {
+        initQuantityControls();
+    }
+
+    // 初始化結帳表單驗證（如果在結帳頁面）
+    if (document.getElementById('checkout-form')) {
+        initCheckoutFormValidation();
+    }
+
+    // 檢查是否在確認頁面並清除購物車
+    checkAndClearCartOnConfirmation();
+});

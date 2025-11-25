@@ -127,10 +127,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] 實作前端表單驗證邏輯（validateCheckoutForm）於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T041 [US4] 實作前端電話號碼格式驗證於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T042 [US4] 更新 Checkout.cshtml 表單驗證訊息顯示於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
-- [ ] T043 [US4] 實作訂單成功後清除 Session Storage 於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T040 [US4] 實作前端表單驗證邏輯（validateCheckoutForm）於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T041 [US4] 實作前端電話號碼格式驗證於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T042 [US4] 更新 Checkout.cshtml 表單驗證訊息顯示於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
+- [x] T043 [US4] 實作訂單成功後清除 Session Storage 於 `OrderLunchWeb/wwwroot/js/order.js`
 
 **Checkpoint**: User Story 4 完成後，訂單驗證和提交流程應完整
 

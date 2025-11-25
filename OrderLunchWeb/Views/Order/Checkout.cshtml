@@ -69,7 +69,7 @@
                             <h5 class="mb-0"><i class="bi bi-person"></i> 訂餐者資訊</h5>
                         </div>
                         <div class="card-body">
-                            <form asp-action="Submit" method="post" id="checkout-form">
+                            <form asp-action="Submit" method="post" id="checkout-form" novalidate>
                                 @Html.AntiForgeryToken()
                                 
                                 <input type="hidden" asp-for="StoreId" />
@@ -83,7 +83,8 @@
                                     <input asp-for="CustomerName" 
                                            class="form-control" 
                                            placeholder="請輸入您的姓名"
-                                           required />
+                                           maxlength="50"
+                                           autocomplete="name" />
                                     <span asp-validation-for="CustomerName" class="text-danger"></span>
                                 </div>
 
@@ -94,14 +95,15 @@
                                     <input asp-for="CustomerPhone" 
                                            class="form-control" 
                                            placeholder="請輸入您的聯絡電話（僅數字）"
-                                           pattern="[0-9]+"
-                                           required />
+                                           inputmode="numeric"
+                                           maxlength="15"
+                                           autocomplete="tel" />
                                     <span asp-validation-for="CustomerPhone" class="text-danger"></span>
-                                    <div class="form-text">電話號碼僅能輸入數字</div>
+                                    <div class="form-text">電話號碼僅能輸入數字，長度 8-15 碼</div>
                                 </div>
 
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-success btn-lg">
+                                    <button type="submit" class="btn btn-success btn-lg" id="btn-submit-order">
                                         <i class="bi bi-check-circle"></i> 確認訂單
                                     </button>
                                 </div>
@@ -125,48 +127,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/order.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 電話號碼即時驗證
-            const phoneInput = document.querySelector('input[name="CustomerPhone"]');
-            if (phoneInput) {
-                phoneInput.addEventListener('input', function() {
-                    // 移除非數字字元
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                });
-            }
-            
-            // 表單提交驗證
-            const form = document.getElementById('checkout-form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    const nameInput = document.querySelector('input[name="CustomerName"]');
-                    const phoneInput = document.querySelector('input[name="CustomerPhone"]');
-                    
-                    let isValid = true;
-                    
-                    if (!nameInput.value.trim()) {
-                        isValid = false;
-                        nameInput.classList.add('is-invalid');
-                    } else {
-                        nameInput.classList.remove('is-invalid');
-                    }
-                    
-                    if (!phoneInput.value.trim()) {
-                        isValid = false;
-                        phoneInput.classList.add('is-invalid');
-                    } else if (!/^\d+$/.test(phoneInput.value)) {
-                        isValid = false;
-                        phoneInput.classList.add('is-invalid');
-                    } else {
-                        phoneInput.classList.remove('is-invalid');
-                    }
-                    
-                    if (!isValid) {
-                        e.preventDefault();
-                    }
-                });
-            }
-        });
-    </script>
 }
