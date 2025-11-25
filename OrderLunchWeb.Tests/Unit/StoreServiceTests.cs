@@ -330,6 +330,7 @@ public class StoreServiceTests : IDisposable
         var afterUpdate = DateTime.Now;
 
         // Assert
+        Assert.NotNull(result);
         Assert.True(result.UpdatedAt >= beforeUpdate && result.UpdatedAt <= afterUpdate);
         Assert.True(result.UpdatedAt > result.CreatedAt, "UpdatedAt 應該晚於 CreatedAt");
     }
@@ -443,6 +444,7 @@ public class StoreServiceTests : IDisposable
         var result = await _service.UpdateStoreAsync(addedStore);
 
         // Assert
+        Assert.NotNull(result);
         Assert.Equal(originalCreatedAt, result.CreatedAt);
         Assert.True(result.UpdatedAt > originalCreatedAt);
     }

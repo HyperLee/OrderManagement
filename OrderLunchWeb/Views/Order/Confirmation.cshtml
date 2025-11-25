@@ -1,0 +1,94 @@
+@model OrderLunchWeb.Models.Order
+@{
+    ViewData["Title"] = "訂單確認";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="text-center mb-4">
+                <div class="display-1 text-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h1 class="mt-3">訂單提交成功！</h1>
+                <p class="lead text-muted">感謝您的訂購，我們已收到您的訂單。</p>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> 訂單資訊</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-4 text-muted">訂單編號</div>
+                        <div class="col-8">
+                            <strong class="text-primary">@Model.OrderId</strong>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 text-muted">訂購時間</div>
+                        <div class="col-8">@Model.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 text-muted">餐廳</div>
+                        <div class="col-8">@Model.StoreName</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 text-muted">訂餐者</div>
+                        <div class="col-8">@Model.CustomerName</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 text-muted">聯絡電話</div>
+                        <div class="col-8">@Model.CustomerPhone</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4 text-muted">訂單狀態</div>
+                        <div class="col-8">
+                            <span class="badge bg-warning text-dark">待確認</span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h6 class="mb-3"><i class="bi bi-list-ul"></i> 訂購項目</h6>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.Items)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <span>@item.MenuItemName</span>
+                                    <br />
+                                    <small class="text-muted">NT$ @item.Price × @item.Quantity</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">NT$ @item.Subtotal</span>
+                            </li>
+                        }
+                    </ul>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong class="fs-5">總金額</strong>
+                        <strong class="text-success fs-4">NT$ @Model.TotalAmount</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="@Url.Action("History", "Order")" class="btn btn-outline-primary">
+                    <i class="bi bi-list-check"></i> 查看訂單紀錄
+                </a>
+                <a href="@Url.Action("SelectRestaurant", "Order")" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> 繼續訂購
+                </a>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> 返回首頁
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/order.js"></script>
+}

@@ -1,0 +1,171 @@
+@model OrderLunchWeb.Models.Store
+@{
+    ViewData["Title"] = $"{Model.Name} - 菜單";
+}
+
+<div class="container">
+    <div class="row">
+        <!-- 菜單區塊 -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1>@Model.Name</h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-geo-alt"></i> @Model.Address
+                        <span class="mx-2">|</span>
+                        <i class="bi bi-telephone"></i> @Model.Phone
+                    </p>
+                </div>
+                <a href="@Url.Action("SelectRestaurant", "Order")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回餐廳列表
+                </a>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="關閉"></button>
+                </div>
+            }
+
+            @if (Model.MenuItems.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    @foreach (var item in Model.MenuItems)
+                    {
+                        <div class="col">
+                            <div class="card h-100 menu-item-card" data-menu-item-id="@item.Id">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title">@item.Name</h5>
+                                        <span class="badge bg-primary fs-6">NT$ @item.Price</span>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <p class="card-text text-muted">@item.Description</p>
+                                    }
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="input-group" style="width: 140px;">
+                                            <button type="button" class="btn btn-outline-primary btn-quantity-minus fw-bold"
+                                                    data-menu-item-id="@item.Id"
+                                                    title="減少數量"
+                                                    aria-label="減少數量">
+                                                <i class="bi bi-dash-lg"></i>
+                                            </button>
+                                            <input type="number" 
+                                                   class="form-control text-center quantity-input fw-bold" 
+                                                   id="quantity-@item.Id"
+                                                   value="1" 
+                                                   min="1" 
+                                                   max="100"
+                                                   aria-label="數量">
+                                            <button type="button" class="btn btn-outline-primary btn-quantity-plus fw-bold"
+                                                    data-menu-item-id="@item.Id"
+                                                    title="增加數量"
+                                                    aria-label="增加數量">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                        <button type="button" 
+                                                class="btn btn-primary flex-grow-1 btn-add-to-cart"
+                                                data-menu-item-id="@item.Id"
+                                                data-menu-item-name="@item.Name"
+                                                data-menu-item-price="@item.Price">
+                                            <i class="bi bi-cart-plus"></i> 加入訂單
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-menu-button-wide display-1 text-muted"></i>
+                    <h3 class="mt-3 text-muted">此餐廳目前沒有可訂購的菜品</h3>
+                    <p class="text-muted">請選擇其他餐廳。</p>
+                </div>
+            }
+        </div>
+
+        <!-- 訂單摘要區塊 -->
+        <div class="col-lg-4">
+            <div class="card shadow sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cart3"></i> 訂單摘要</h5>
+                    <span class="badge bg-light text-primary" id="order-item-count">0 項</span>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <div id="order-summary-empty" class="text-center py-4">
+                        <i class="bi bi-cart display-4 text-muted"></i>
+                        <p class="text-muted mt-2">購物車是空的</p>
+                        <p class="text-muted small">點擊「加入訂單」開始點餐</p>
+                    </div>
+                    <div id="order-summary-items" class="d-none">
+                        <ul class="list-group list-group-flush" id="order-items-list">
+                            <!-- 動態填入訂單項目 -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>總金額</strong>
+                        <strong class="text-primary fs-4" id="order-total">NT$ 0</strong>
+                    </div>
+                    <button type="button" 
+                            class="btn btn-secondary w-100" 
+                            id="btn-checkout"
+                            disabled>
+                        <i class="bi bi-credit-card"></i> 前往結帳
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/order.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const storeId = '@Model.Id';
+            const storeName = @Html.Raw(Json.Serialize(Model.Name));
+            
+            // 初始化購物車
+            CartStorage.initCart(storeId, storeName);
+            
+            // 更新訂單摘要顯示
+            updateOrderSummary();
+            
+            // 初始化數量控制功能（使用 order.js 提供的函式）
+            initQuantityControls();
+            
+            // 綁定「加入訂單」按鈕事件
+            document.querySelectorAll('.btn-add-to-cart').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const menuItemId = this.dataset.menuItemId;
+                    const menuItemName = this.dataset.menuItemName;
+                    const menuItemPrice = parseFloat(this.dataset.menuItemPrice);
+                    
+                    // 使用驗證後的數量值
+                    const quantity = getQuantity(menuItemId);
+                    
+                    addToOrder(menuItemId, menuItemName, menuItemPrice, quantity);
+                    
+                    // 重設數量為 1
+                    setQuantity(menuItemId, 1);
+                });
+            });
+            
+            // 綁定「前往結帳」按鈕事件
+            document.getElementById('btn-checkout').addEventListener('click', function() {
+                goToCheckout();
+            });
+        });
+    </script>
+}
