@@ -62,24 +62,24 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [US1] 建立 OrderService 單元測試於 `OrderLunchWeb.Tests/Unit/OrderServiceTests.cs`
-- [ ] T018 [US1] 建立 OrderController 整合測試於 `OrderLunchWeb.Tests/Integration/OrderControllerTests.cs`
+- [x] T017 [US1] 建立 OrderService 單元測試於 `OrderLunchWeb.Tests/Unit/OrderServiceTests.cs`
+- [x] T018 [US1] 建立 OrderController 整合測試於 `OrderLunchWeb.Tests/Integration/OrderControllerTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [US1] 建立 OrderController 控制器骨架（含建構子和 DI）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T020 [US1] 實作 SelectRestaurant Action（餐廳列表頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T021 [US1] 實作 Menu Action（菜單頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T022 [US1] 實作 Checkout Action（結帳頁面 GET）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T023 [US1] 實作 Submit Action（提交訂單 POST）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T024 [US1] 實作 Confirmation Action（訂單確認頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
-- [ ] T025 [US1] 建立 SelectRestaurant.cshtml 視圖（餐廳列表）於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
-- [ ] T026 [US1] 建立 Menu.cshtml 視圖（菜單頁面含訂單摘要區塊）於 `OrderLunchWeb/Views/Order/Menu.cshtml`
-- [ ] T027 [US1] 建立 Checkout.cshtml 視圖（結帳頁面含表單驗證）於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
-- [ ] T028 [US1] 建立 Confirmation.cshtml 視圖（訂單確認頁面）於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
-- [ ] T029 [US1] 更新首頁新增「訂購餐點」按鈕於 `OrderLunchWeb/Views/Home/Index.cshtml`
-- [ ] T030 [US1] 實作前端「加入訂單」功能函式於 `OrderLunchWeb/wwwroot/js/order.js`
-- [ ] T031 [US1] 實作前端「前往結帳」功能函式於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T019 [US1] 建立 OrderController 控制器骨架（含建構子和 DI）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T020 [US1] 實作 SelectRestaurant Action（餐廳列表頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T021 [US1] 實作 Menu Action（菜單頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T022 [US1] 實作 Checkout Action（結帳頁面 GET）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T023 [US1] 實作 Submit Action（提交訂單 POST）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T024 [US1] 實作 Confirmation Action（訂單確認頁面）於 `OrderLunchWeb/Controllers/OrderController.cs`
+- [x] T025 [US1] 建立 SelectRestaurant.cshtml 視圖（餐廳列表）於 `OrderLunchWeb/Views/Order/SelectRestaurant.cshtml`
+- [x] T026 [US1] 建立 Menu.cshtml 視圖（菜單頁面含訂單摘要區塊）於 `OrderLunchWeb/Views/Order/Menu.cshtml`
+- [x] T027 [US1] 建立 Checkout.cshtml 視圖（結帳頁面含表單驗證）於 `OrderLunchWeb/Views/Order/Checkout.cshtml`
+- [x] T028 [US1] 建立 Confirmation.cshtml 視圖（訂單確認頁面）於 `OrderLunchWeb/Views/Order/Confirmation.cshtml`
+- [x] T029 [US1] 更新首頁新增「訂購餐點」按鈕於 `OrderLunchWeb/Views/Home/Index.cshtml`
+- [x] T030 [US1] 實作前端「加入訂單」功能函式於 `OrderLunchWeb/wwwroot/js/order.js`
+- [x] T031 [US1] 實作前端「前往結帳」功能函式於 `OrderLunchWeb/wwwroot/js/order.js`
 
 **Checkpoint**: User Story 1 完成後，應可獨立測試完整的訂餐流程
 

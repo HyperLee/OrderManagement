@@ -263,3 +263,51 @@ function formatCurrency(amount) {
         maximumFractionDigits: 0
     });
 }
+
+/**
+ * 將菜品加入訂單
+ * @param {string} menuItemId 菜品 ID
+ * @param {string} name 菜品名稱
+ * @param {number} price 單價
+ * @param {number} quantity 數量
+ */
+function addToOrder(menuItemId, name, price, quantity) {
+    if (!menuItemId || !name || price <= 0 || quantity < 1) {
+        console.error('加入訂單參數無效');
+        return;
+    }
+
+    const item = {
+        menuItemId: menuItemId,
+        name: name,
+        price: price,
+        quantity: Math.min(Math.max(parseInt(quantity, 10) || 1, 1), 100)
+    };
+
+    const result = CartStorage.addItem(item);
+    
+    if (result) {
+        // 更新 UI（如果有 updateOrderSummaryUI 函式）
+        if (typeof updateOrderSummaryUI === 'function') {
+            updateOrderSummaryUI();
+        }
+        
+        // 顯示成功訊息（可選）
+        console.log('已加入訂單:', name, 'x', quantity);
+    }
+}
+
+/**
+ * 前往結帳頁面
+ */
+function goToCheckout() {
+    if (CartStorage.isEmpty()) {
+        alert('購物車是空的，請先選擇菜品。');
+        return;
+    }
+
+    const cartJson = CartStorage.toJson();
+    const checkoutUrl = '/Order/Checkout?cartData=' + encodeURIComponent(cartJson);
+    
+    window.location.href = checkoutUrl;
+}

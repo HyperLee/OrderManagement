@@ -1,0 +1,172 @@
+@model OrderLunchWeb.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "結帳";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">結帳</h1>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> 請修正以下錯誤</h5>
+                    <ul class="mb-0">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <div class="row">
+                <!-- 訂單明細 -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="bi bi-receipt"></i> 訂單明細</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">
+                                <strong>餐廳：</strong>@Model.StoreName
+                            </p>
+                            <hr />
+                            @if (Model.Items.Any())
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var item in Model.Items)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <div>
+                                                <span class="fw-bold">@item.MenuItemName</span>
+                                                <br />
+                                                <small class="text-muted">NT$ @item.Price × @item.Quantity</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">NT$ @item.Subtotal</span>
+                                        </li>
+                                    }
+                                </ul>
+                                <hr />
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="fs-5">總金額</strong>
+                                    <strong class="text-primary fs-4">NT$ @Model.TotalAmount</strong>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center">訂單項目將由購物車載入</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 訂餐者資訊表單 -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-person"></i> 訂餐者資訊</h5>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Submit" method="post" id="checkout-form">
+                                @Html.AntiForgeryToken()
+                                
+                                <input type="hidden" asp-for="StoreId" />
+                                <input type="hidden" asp-for="StoreName" />
+                                <input type="hidden" asp-for="CartData" />
+
+                                <div class="mb-3">
+                                    <label asp-for="CustomerName" class="form-label">
+                                        <i class="bi bi-person-fill"></i> 姓名 <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="CustomerName" 
+                                           class="form-control" 
+                                           placeholder="請輸入您的姓名"
+                                           required />
+                                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="CustomerPhone" class="form-label">
+                                        <i class="bi bi-telephone-fill"></i> 聯絡電話 <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="CustomerPhone" 
+                                           class="form-control" 
+                                           placeholder="請輸入您的聯絡電話（僅數字）"
+                                           pattern="[0-9]+"
+                                           required />
+                                    <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+                                    <div class="form-text">電話號碼僅能輸入數字</div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="bi bi-check-circle"></i> 確認訂單
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="@Url.Action("Menu", "Order", new { storeId = Model.StoreId })" 
+                   class="btn btn-outline-secondary"
+                   id="btn-back-to-menu">
+                    <i class="bi bi-arrow-left"></i> 返回修改訂單
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/order.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 電話號碼即時驗證
+            const phoneInput = document.querySelector('input[name="CustomerPhone"]');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function() {
+                    // 移除非數字字元
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
+            
+            // 表單提交驗證
+            const form = document.getElementById('checkout-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const nameInput = document.querySelector('input[name="CustomerName"]');
+                    const phoneInput = document.querySelector('input[name="CustomerPhone"]');
+                    
+                    let isValid = true;
+                    
+                    if (!nameInput.value.trim()) {
+                        isValid = false;
+                        nameInput.classList.add('is-invalid');
+                    } else {
+                        nameInput.classList.remove('is-invalid');
+                    }
+                    
+                    if (!phoneInput.value.trim()) {
+                        isValid = false;
+                        phoneInput.classList.add('is-invalid');
+                    } else if (!/^\d+$/.test(phoneInput.value)) {
+                        isValid = false;
+                        phoneInput.classList.add('is-invalid');
+                    } else {
+                        phoneInput.classList.remove('is-invalid');
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+}

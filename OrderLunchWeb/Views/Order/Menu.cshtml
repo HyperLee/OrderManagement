@@ -1,0 +1,259 @@
+@model OrderLunchWeb.Models.Store
+@{
+    ViewData["Title"] = $"{Model.Name} - 菜單";
+}
+
+<div class="container">
+    <div class="row">
+        <!-- 菜單區塊 -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1>@Model.Name</h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-geo-alt"></i> @Model.Address
+                        <span class="mx-2">|</span>
+                        <i class="bi bi-telephone"></i> @Model.Phone
+                    </p>
+                </div>
+                <a href="@Url.Action("SelectRestaurant", "Order")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回餐廳列表
+                </a>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="關閉"></button>
+                </div>
+            }
+
+            @if (Model.MenuItems.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    @foreach (var item in Model.MenuItems)
+                    {
+                        <div class="col">
+                            <div class="card h-100 menu-item-card" data-menu-item-id="@item.Id">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title">@item.Name</h5>
+                                        <span class="badge bg-primary fs-6">NT$ @item.Price</span>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <p class="card-text text-muted">@item.Description</p>
+                                    }
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="input-group input-group-sm" style="width: 120px;">
+                                            <button type="button" class="btn btn-outline-secondary btn-quantity-minus"
+                                                    data-menu-item-id="@item.Id">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="number" 
+                                                   class="form-control text-center quantity-input" 
+                                                   id="quantity-@item.Id"
+                                                   value="1" 
+                                                   min="1" 
+                                                   max="100">
+                                            <button type="button" class="btn btn-outline-secondary btn-quantity-plus"
+                                                    data-menu-item-id="@item.Id">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                        <button type="button" 
+                                                class="btn btn-primary flex-grow-1 btn-add-to-cart"
+                                                data-menu-item-id="@item.Id"
+                                                data-menu-item-name="@item.Name"
+                                                data-menu-item-price="@item.Price">
+                                            <i class="bi bi-cart-plus"></i> 加入訂單
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-menu-button-wide display-1 text-muted"></i>
+                    <h3 class="mt-3 text-muted">此餐廳目前沒有可訂購的菜品</h3>
+                    <p class="text-muted">請選擇其他餐廳。</p>
+                </div>
+            }
+        </div>
+
+        <!-- 訂單摘要區塊 -->
+        <div class="col-lg-4">
+            <div class="card shadow sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-cart3"></i> 訂單摘要</h5>
+                </div>
+                <div class="card-body">
+                    <div id="order-summary-empty" class="text-center py-4">
+                        <i class="bi bi-cart display-4 text-muted"></i>
+                        <p class="text-muted mt-2">購物車是空的</p>
+                        <p class="text-muted small">點擊「加入訂單」開始點餐</p>
+                    </div>
+                    <div id="order-summary-items" class="d-none">
+                        <ul class="list-group list-group-flush" id="order-items-list">
+                            <!-- 動態填入訂單項目 -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>總金額</strong>
+                        <strong class="text-primary fs-5" id="order-total">NT$ 0</strong>
+                    </div>
+                    <button type="button" 
+                            class="btn btn-success w-100" 
+                            id="btn-checkout"
+                            disabled>
+                        <i class="bi bi-credit-card"></i> 前往結帳
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/order.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const storeId = '@Model.Id';
+            const storeName = '@Model.Name';
+            
+            // 初始化購物車
+            CartStorage.initCart(storeId, storeName);
+            
+            // 更新訂單摘要顯示
+            updateOrderSummaryUI();
+            
+            // 綁定「加入訂單」按鈕事件
+            document.querySelectorAll('.btn-add-to-cart').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const menuItemId = this.dataset.menuItemId;
+                    const menuItemName = this.dataset.menuItemName;
+                    const menuItemPrice = parseFloat(this.dataset.menuItemPrice);
+                    const quantityInput = document.getElementById('quantity-' + menuItemId);
+                    const quantity = parseInt(quantityInput.value, 10) || 1;
+                    
+                    addToOrder(menuItemId, menuItemName, menuItemPrice, quantity);
+                    
+                    // 重設數量為 1
+                    quantityInput.value = 1;
+                });
+            });
+            
+            // 綁定數量 +/- 按鈕事件
+            document.querySelectorAll('.btn-quantity-minus').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const menuItemId = this.dataset.menuItemId;
+                    const input = document.getElementById('quantity-' + menuItemId);
+                    const currentValue = parseInt(input.value, 10) || 1;
+                    input.value = Math.max(1, currentValue - 1);
+                });
+            });
+            
+            document.querySelectorAll('.btn-quantity-plus').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const menuItemId = this.dataset.menuItemId;
+                    const input = document.getElementById('quantity-' + menuItemId);
+                    const currentValue = parseInt(input.value, 10) || 1;
+                    input.value = Math.min(100, currentValue + 1);
+                });
+            });
+            
+            // 綁定數量輸入驗證
+            document.querySelectorAll('.quantity-input').forEach(function(input) {
+                input.addEventListener('change', function() {
+                    let value = parseInt(this.value, 10);
+                    if (isNaN(value) || value < 1) {
+                        this.value = 1;
+                    } else if (value > 100) {
+                        this.value = 100;
+                    }
+                });
+            });
+            
+            // 綁定「前往結帳」按鈕事件
+            document.getElementById('btn-checkout').addEventListener('click', function() {
+                goToCheckout();
+            });
+        });
+        
+        /**
+         * 更新訂單摘要 UI
+         */
+        function updateOrderSummaryUI() {
+            const cart = CartStorage.getCart();
+            const emptyDiv = document.getElementById('order-summary-empty');
+            const itemsDiv = document.getElementById('order-summary-items');
+            const itemsList = document.getElementById('order-items-list');
+            const totalSpan = document.getElementById('order-total');
+            const checkoutBtn = document.getElementById('btn-checkout');
+            
+            if (cart.items.length === 0) {
+                emptyDiv.classList.remove('d-none');
+                itemsDiv.classList.add('d-none');
+                totalSpan.textContent = 'NT$ 0';
+                checkoutBtn.disabled = true;
+                return;
+            }
+            
+            emptyDiv.classList.add('d-none');
+            itemsDiv.classList.remove('d-none');
+            checkoutBtn.disabled = false;
+            
+            // 建立項目列表
+            itemsList.innerHTML = '';
+            cart.items.forEach(function(item) {
+                const subtotal = Math.round(item.price * item.quantity * 100) / 100;
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-start';
+                li.innerHTML = `
+                    <div class="me-auto">
+                        <div class="fw-bold">${escapeHtml(item.name)}</div>
+                        <small class="text-muted">NT$ ${item.price} × ${item.quantity}</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary rounded-pill">NT$ ${subtotal}</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" 
+                                data-menu-item-id="${item.menuItemId}">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+                itemsList.appendChild(li);
+            });
+            
+            // 綁定刪除按鈕
+            document.querySelectorAll('.btn-remove-item').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const menuItemId = this.dataset.menuItemId;
+                    CartStorage.removeItem(menuItemId);
+                    updateOrderSummaryUI();
+                });
+            });
+            
+            // 更新總金額
+            totalSpan.textContent = formatCurrency(CartStorage.getTotalAmount());
+        }
+        
+        /**
+         * HTML 轉義函式
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+}
